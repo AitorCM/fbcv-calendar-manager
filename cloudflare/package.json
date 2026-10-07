@@ -1,0 +1,19 @@
+{
+  "name": "fbcv-calendar-cloudflare",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "types": "wrangler types",
+    "check": "wrangler types && tsc --noEmit",
+    "deploy": "wrangler deploy",
+    "dry-run": "wrangler deploy --dry-run",
+    "build": "npm --prefix ../frontend ci --no-audit --no-fund && npm --prefix ../frontend run build",
+    "predeploy": "npm run build && npm run check"
+  },
+  "devDependencies": {
+    "node": "22.23.3",
+    "typescript": "~5.8.3",
+    "wrangler": "4.148.0"
+  }
+}

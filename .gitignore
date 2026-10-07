@@ -17,3 +17,9 @@ frontend/dist/
 *.sqlite3
 *.sqlite3-*
 *.log
+
+cloudflare/node_modules/
+cloudflare/.wrangler/
+cloudflare/worker-configuration.d.ts
+.dev.vars
+.dev.vars.*

@@ -5,7 +5,10 @@ con crawler Python/Scrapy, SQLite y ejecución en Docker. Incluye API FastAPI y
 frontend React para consultar clubes, equipos y jornadas, detectar posibles
 incompatibilidades y guardar revisiones. Incluye temas claro y oscuro.
 
-Para desplegar desde GitHub: [guía de Ubuntu](docs/deployment.md).
+PoC publicada: [En pista](https://fbcv-calendar-manager.aitor935.workers.dev).
+
+Para probar sin VPS: [guía de Cloudflare](docs/cloudflare.md).
+Para desplegar en un servidor: [guía de Ubuntu](docs/deployment.md).
 
 ## Ejecución local
 

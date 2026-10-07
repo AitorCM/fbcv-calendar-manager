@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fbcv-calendar-manager",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-07",
+  "workers_dev": true,
+  "assets": {
+    "directory": "../frontend/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fbcv-calendar-manager",
+      "database_id": "30b3f19f-d900-4d44-8b19-fd3ccc161b96",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01,
+    },
+  },
+  "account_id": "a5fdebf95a03590fd4652e4906d48fa5",
+}
