@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    init: true
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    ports:
+      - "127.0.0.1:8080:8000"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+  crawler:
+    build: .
+    init: true
+    profiles: ["tools"]
+    volumes:
+      - ./data:/data
+    command: ["crawl", "--season", "2026"]

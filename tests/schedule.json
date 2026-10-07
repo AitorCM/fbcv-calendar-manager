@@ -1,0 +1,40 @@
+{
+  "group": {
+    "season": "2026",
+    "idGroup": "2601"
+  },
+  "totalRounds": 1,
+  "rounds": {
+    "1": {
+      "date": "2026-10-09",
+      "matches": {
+        "65180": {
+          "idMatch": "65180",
+          "idMatchCall": "95635",
+          "season": "2026",
+          "idGroup": "2601",
+          "idLocalClub": "1715",
+          "nameLocalTeamOrganization": "CLUB ESPORTIU GRAU",
+          "idVisitorClub": "920",
+          "nameVisitorTeamOrganization": "C.D. MARISTAS",
+          "idLocalTeam": "10318",
+          "nameLocalTeam": "FERRETERIA ESCRIG CE GRAU CS A",
+          "idVisitorTeam": "10929",
+          "nameVisitorTeam": "MARISTAS VALENCIA A",
+          "matchDay": "2026-10-15 21:00:00",
+          "numMatchDay": "1",
+          "state": "0",
+          "nameField": "PAB MUNI EMILIO FABREGAT",
+          "nameTown": "Castellón de la Plana/Castelló",
+          "localScore": null,
+          "visitorScore": null
+        }
+      }
+    }
+  },
+  "rest": {
+    "1": {
+      "10543": "NB TORRENT B"
+    }
+  }
+}
