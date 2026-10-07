@@ -6,9 +6,9 @@ La web React se sirve con Workers Static Assets. Una API TypeScript en Workers
 mantiene las mismas rutas que FastAPI y usa D1, el SQLite gestionado de
 Cloudflare. Docker/FastAPI/SQLite local siguen disponibles para un futuro VPS.
 
-El crawler Scrapy sigue ejecutándose en el equipo local. No hay extracción ni
-actualización automática en Cloudflare: se publica una copia de los datos ya
-validados. El exportador reutiliza los formatos de la API Python y el detector
+El crawler Scrapy puede ejecutarse localmente o en GitHub Actions dos veces al
+día. Cloudflare recibe una copia de los datos validados; el crawler no se
+ejecuta dentro del Worker. El exportador reutiliza los formatos de la API Python y el detector
 de coincidencias, para mantener el mismo resultado en ambas versiones.
 
 ## Cuenta y recursos
@@ -61,9 +61,9 @@ mantienen entre versiones si sus horarios, equipos e instalación no cambian.
 Las revisiones locales de `data/reviews.sqlite3` y las de D1 son independientes;
 esta primera publicación parte sin revisiones locales (la base estaba vacía).
 
-Se conservan versiones antiguas para recuperación. Al refrescar repetidamente,
-controlar el almacenamiento y limpiar versiones inactivas mediante una tarea
-específica; nunca borrar `conflict_reviews`. El SQL generado permanece fuera de
+La actualización automática conserva las dos versiones más recientes por temporada
+y cualquier versión activa. Limpia el resto con `cloudflare/cleanup-snapshots.sql`
+solo después de una importación correcta; nunca modifica `conflict_reviews`. El SQL generado permanece fuera de
 Git. La carga inicial usa aproximadamente 15 MB y 14.062 escrituras de D1,
 contando los índices, con 228 clubes, 1.940 equipos y 2.693 incidencias por club.
 Una pareja que afecta a dos clubes aparece una vez en cada club.
@@ -122,3 +122,37 @@ npm exec -- wrangler d1 export DB --remote --output ../data/backups/cloudflare-d
 
 Crear `data/backups` previamente. Para recuperar datos, preparar y validar una
 restauración en una base nueva antes de cambiar el binding de producción.
+
+
+## Actualización automática en GitHub Actions
+
+El workflow `.github/workflows/refresh-calendars.yml` está programado a las
+**00:00 y 12:00 Europe/Madrid**, con ajuste automático de horario de verano.
+GitHub puede retrasar el inicio; son las horas previstas de comienzo, no de
+finalización. [Documentación del horario](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onschedule).
+
+Antes de activar la publicación, crear un token personalizado en la cuenta de
+Cloudflare usada por la PoC, con permiso **Account → D1 → Edit**, limitado a esa
+cuenta. No hace falta permiso para desplegar Workers: solo cambia la base D1.
+Guardar el valor en el secret de repositorio `CLOUDFLARE_API_TOKEN` en
+[GitHub → Settings → Secrets and variables → Actions](https://github.com/AitorCM/fbcv-calendar-manager/settings/secrets/actions).
+No copiarlo al código, al chat ni usar el OAuth local de Wrangler.
+[Creación de tokens](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/).
+
+El job falla al principio si falta el secret. Descarga desde cero toda la
+temporada 2026–2027, sin `--resume`, para detectar modificaciones. Exige estado
+`complete` y cobertura total antes de exportar/publicar. Si falla el crawler,
+los calendarios publicados no cambian. Las revisiones de D1 se conservan.
+La limpieza posterior limita almacenamiento; con los datos actuales, importación
+y limpieza dos veces al día suman aproximadamente 56.000 escrituras diarias,
+además de las revisiones de visitantes y del consumo de otras bases de la cuenta.
+
+Desde la pestaña [Actions](https://github.com/AitorCM/fbcv-calendar-manager/actions/workflows/refresh-calendars.yml)
+puede ejecutarse manualmente. `dry_run=true` permite probar descarga y exportación
+sin credenciales ni cambios en D1. Los informes quedan como artifacts durante
+14 días. El job tiene un límite de 90 minutos y no permite ejecuciones simultáneas.
+No se sube SQLite al repositorio ni se vuelve a desplegar el frontend.
+
+En repositorios públicos, GitHub puede desactivar las tareas programadas tras
+60 días sin actividad: revisar su estado en Actions si deja de actualizarse.
+[Limitaciones del scheduler](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).

@@ -1,0 +1,104 @@
+name: Actualizar calendarios FBCV
+
+on:
+  schedule:
+    - cron: '0 0,12 * * *'
+      timezone: Europe/Madrid
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Descargar y validar sin publicar en D1
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fbcv-calendar-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SEASON: '2026'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Comprobar credencial de publicación
+        if: ${{ !inputs.dry_run }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo '::error::Falta el secret CLOUDFLARE_API_TOKEN (Account / D1 / Edit).'
+            exit 1
+          fi
+      - uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: '0.12.19'
+          enable-cache: true
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: cloudflare/package-lock.json
+      - name: Instalar dependencias fijadas
+        run: |
+          uv sync --locked --python 3.12
+          npm ci --prefix cloudflare --no-audit --no-fund
+      - name: Descargar toda la temporada
+        run: uv run fbcv-crawl crawl --season "$SEASON"
+      - name: Validar cobertura completa
+        run: |
+          uv run fbcv-crawl report --season "$SEASON" > data/refresh-report.json
+          uv run python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('data/refresh-report.json').read_text())
+          if report['status'] != 'complete' or report['downloaded_groups'] != report['discovered_groups']:
+              raise SystemExit('Extracción incompleta: no se publica en D1')
+          print(json.dumps(report, ensure_ascii=False, indent=2))
+          PY
+      - name: Preparar calendarios e incompatibilidades
+        run: uv run python scripts/export_cloudflare.py --season "$SEASON"
+      - name: Publicar versión nueva y conservar revisiones
+        if: ${{ !inputs.dry_run }}
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CI: 'true'
+        run: |
+          npm exec -- wrangler d1 execute DB --remote --file ../data/cloudflare-snapshot.sql --yes
+          npm exec -- wrangler d1 execute DB --remote --file cleanup-snapshots.sql --yes
+      - name: Comprobar versión publicada
+        if: ${{ !inputs.dry_run }}
+        run: |
+          curl --fail --retry 3 --silent --show-error 'https://fbcv-calendar-manager.aitor935.workers.dev/api/meta?season=2026' > data/published-meta.json
+          uv run python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from fbcv_calendar.api import create_app
+          app = create_app('data/fbcv.sqlite3', static_dir='data/no-static')
+          endpoint = next(r.endpoint for r in app.routes if r.path == '/api/meta')
+          expected = endpoint(season='2026')
+          actual = json.loads(Path('data/published-meta.json').read_text())
+          if actual != expected:
+              raise SystemExit('La versión pública no coincide con esta extracción')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write(f"Calendarios actualizados: {actual['season_label']}. Consulta FBCV: {actual['updated_at']}.\n")
+          PY
+      - name: Guardar informe de diagnóstico
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: crawl-report-${{ github.run_id }}
+          path: |
+            data/reports/*.json
+            data/refresh-report.json
+            data/published-meta.json
+          if-no-files-found: ignore
+          retention-days: 14
