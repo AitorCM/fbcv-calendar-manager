@@ -1112,6 +1112,7 @@ footer a:hover {
 /* Club review desk: a paired fixture strip makes each comparison explicit. */
 .view-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 0 0 24px;
   border-bottom: 1px solid var(--line);
@@ -1126,6 +1127,37 @@ footer a:hover {
 .view-tabs button[aria-pressed="true"] {
   border-color: var(--orange);
   color: var(--orange);
+}
+.upcoming-list {
+  display: grid;
+  gap: 28px;
+  padding: 0 32px 32px;
+}
+.upcoming-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.upcoming-heading h3 {
+  margin: 4px 0 0;
+  font: 600 24px "Barlow Condensed", sans-serif;
+}
+.upcoming-heading .eyebrow {
+  margin: 0;
+}
+.upcoming-heading .team-button {
+  width: auto;
+}
+@media (max-width: 680px) {
+  .upcoming-list {
+    padding: 0 20px 20px;
+  }
+  .view-tabs button {
+    padding: 14px 12px;
+  }
 }
 .conflicts-intro {
   padding: 28px 32px 0;

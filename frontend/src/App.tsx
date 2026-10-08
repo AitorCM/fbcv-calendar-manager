@@ -1,6 +1,7 @@
 import ThemeToggle from "./ThemeToggle";
 import ConflictsPanel from "./ConflictsPanel";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { upcomingMatches } from "./upcoming";
 
 type Club = { id: string; name: string; team_count: number };
 type Team = {
@@ -38,7 +39,7 @@ type Group = {
   phase: string;
   rounds: Round[];
 };
-type Calendar = { team: Team; groups: Group[] };
+export type Calendar = { team: Team; groups: Group[] };
 type Meta = { season_label: string; updated_at: string | null; status: string };
 const fold = (s: string) =>
   s
@@ -259,13 +260,17 @@ function MatchCard({ match: m, team }: { match: Match; team: string }) {
   );
 }
 export default function App() {
-  const [view, setView] = useState("calendar");
+  const [view, setView] = useState("upcoming");
   const [clubs, setClubs] = useState<Club[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [club, setClub] = useState<Club | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
   const [team, setTeam] = useState<Team | null>(null);
   const [calendar, setCalendar] = useState<Calendar | null>(null);
+  const [clubCalendars, setClubCalendars] = useState<Calendar[]>([]);
+  const [upcomingLoading, setUpcomingLoading] = useState(false);
+  const [upcomingError, setUpcomingError] = useState("");
+  const [upcomingRetry, setUpcomingRetry] = useState(0);
   const [groupId, setGroupId] = useState("");
   const [loading, setLoading] = useState("clubs");
   const [error, setError] = useState("");
@@ -310,6 +315,28 @@ export default function App() {
     return () => c.abort();
   }, [club, retry]);
   useEffect(() => {
+    if (!club || !teams.length) return;
+    const c = new AbortController();
+    setUpcomingLoading(true);
+    setUpcomingError("");
+    Promise.all(
+      teams.map((t) =>
+        get<Calendar>(`/api/clubs/${club.id}/teams/${t.id}/calendar`, c.signal),
+      ),
+    )
+      .then((data) => {
+        setClubCalendars(data);
+        setUpcomingLoading(false);
+      })
+      .catch((e) => {
+        if (e.name !== "AbortError") {
+          setUpcomingError(e.message);
+          setUpcomingLoading(false);
+        }
+      });
+    return () => c.abort();
+  }, [club, teams, upcomingRetry]);
+  useEffect(() => {
     if (!club || !team) return;
     const c = new AbortController();
     setError("");
@@ -338,11 +365,16 @@ export default function App() {
   function selectClub(c: Club) {
     if (club?.id === c.id) return;
     setClub(c);
+    setView("upcoming");
+    setClubCalendars([]);
+    setUpcomingError("");
+    setUpcomingLoading(false);
     setTeams([]);
     setTeam(null);
     setCalendar(null);
   }
   function selectTeam(t: Team) {
+    setView("calendar");
     if (team?.id === t.id) return;
     setTeam(t);
     setCalendar(null);
@@ -387,6 +419,12 @@ export default function App() {
         </div>
         <nav className="view-tabs" aria-label="Vistas del club">
           <button
+            aria-pressed={view === "upcoming"}
+            onClick={() => setView("upcoming")}
+          >
+            Próximos partidos
+          </button>
+          <button
             aria-pressed={view === "calendar"}
             onClick={() => setView("calendar")}
           >
@@ -423,7 +461,7 @@ export default function App() {
                     <p>{teams.length} equipos con calendario</p>
                   </div>
                 </div>
-                {view === "calendar" && (
+                {view !== "conflicts" && (
                   <>
                     <div className="section-label">
                       ELIGE UN EQUIPO{" "}
@@ -488,11 +526,76 @@ export default function App() {
           <section
             className="calendar-panel"
             aria-label={
-              view === "calendar"
+              view === "upcoming"
+                ? "Próximos partidos del club"
+                : view === "calendar"
                 ? "Calendario del equipo"
                 : "Incompatibilidades del club"
             }
           >
+            {view === "upcoming" && (
+              <>
+                <div className="panel-toolbar">
+                  <span className="section-label">PRÓXIMOS PARTIDOS</span>
+                  <span className="subtle">De sénior a benjamín</span>
+                </div>
+                {(error || upcomingError) && (
+                  <div className="error" role="alert">
+                    <p>{error || upcomingError}</p>
+                    <button
+                      onClick={() =>
+                        error
+                          ? setRetry((r) => r + 1)
+                          : setUpcomingRetry((r) => r + 1)
+                      }
+                    >
+                      Volver a intentar
+                    </button>
+                  </div>
+                )}
+                {!club ? (
+                  <div className="empty-state">
+                    <h2>Busca tu club.</h2>
+                    <p>Consulta el próximo partido de cada equipo, de mayor a menor categoría.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="team-title">
+                      <p className="eyebrow">{club.name}</p>
+                      <h2>El club, en pista.</h2>
+                      <p className="muted">Un próximo partido por equipo, entre todas sus competiciones.</p>
+                    </div>
+                    {(loading === "teams" || upcomingLoading) && (
+                      <div className="loading-calendar" role="status">
+                        <span className="spinner" />
+                        Cargando próximos partidos…
+                      </div>
+                    )}
+                    {!error && !upcomingError && loading !== "teams" && !upcomingLoading && (
+                      <div className="upcoming-list">
+                        {upcomingMatches(clubCalendars).map(({ team: t, match, category }) => (
+                          <section key={t.id} className="upcoming-team" aria-label={t.name}>
+                            <div className="upcoming-heading">
+                              <div>
+                                <p className="eyebrow">{category || t.categories}</p>
+                                <h3>{t.name}</h3>
+                              </div>
+                              <button className="team-button" onClick={() => selectTeam(t)}>
+                                Ver calendario <Arrow />
+                              </button>
+                            </div>
+                            {match ? <MatchCard match={match} team={t.name} /> : (
+                              <p className="muted">Sin próximo partido con fecha y hora publicadas.</p>
+                            )}
+                          </section>
+                        ))}
+                        {!teams.length && <p className="muted">Este club no tiene equipos con calendario publicado.</p>}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
             {view === "conflicts" &&
               (club ? (
                 <ConflictsPanel
