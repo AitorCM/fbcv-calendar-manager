@@ -83,6 +83,53 @@ publicar, ejecutar `npm run build`, `npm run check` y `npm run dry-run`.
 La URL `workers.dev` aparece al terminar el despliegue. La configuración no
 crea dominios personalizados ni cambia otras aplicaciones de la cuenta.
 
+## Despliegue automático de la web
+
+El workflow `.github/workflows/deploy-web.yml` publica Worker y frontend en
+cada push a `main`. También permite ejecución manual desde Actions, solo en
+`main`. Ejecuta pruebas Python y frontend, compila la web, comprueba tipos y
+valida el empaquetado con `wrangler deploy --dry-run` antes de publicar.
+Después comprueba que la web y `/api/meta` responden correctamente. El SHA
+del commit queda en el mensaje de la versión de Cloudflare y en el resumen
+de Actions. Los despliegues no se ejecutan simultáneamente ni se cancelan
+durante una publicación por un push posterior.
+
+### Configuración manual necesaria
+
+1. Actualizar el token de API existente en Cloudflare con rol **Workers → Editor**, limitado
+   al Worker existente `fbcv-calendar-manager` de la cuenta configurada en
+   `cloudflare/wrangler.jsonc`. Si el panel todavía muestra permisos antiguos,
+   el equivalente es **Account → Workers Scripts → Edit**, limitado a esa
+   cuenta. Conservar **Account → D1 → Edit**, necesario para el crawler.
+   El despliegue de código no necesita permisos de zonas ni modifica D1.
+2. Ambos workflows usan el secret de repositorio **`CLOUDFLARE_API_TOKEN`**
+   en [GitHub → Settings → Secrets and variables → Actions](https://github.com/AitorCM/fbcv-calendar-manager/settings/secrets/actions).
+   Si solo cambian permisos del mismo token, no hace falta actualizar el valor
+   del secret. Si se crea otro token, reemplazarlo en GitHub. No pegar su valor
+   en el chat, código ni logs. No hace falta crear otro secret.
+3. Una vez subido el workflow a `main`, abrir
+   [Actions → Desplegar web en Cloudflare](https://github.com/AitorCM/fbcv-calendar-manager/actions/workflows/deploy-web.yml)
+   y usar **Run workflow** sobre `main`, o hacer un nuevo push. Si el workflow
+   falló antes de crear el secret, volver a ejecutar el job fallido.
+
+No hace falta crear otro Worker, base D1 ni conectar Workers Builds. Si ya
+existe un despliegue automático configurado en Cloudflare, desactivarlo para
+evitar dos pipelines publicando sobre el mismo Worker. Este workflow no ejecuta
+el crawler, importaciones SQL ni migraciones; los datos siguen actualizándose
+con `refresh-calendars.yml`.
+
+Permisos: [Workers y Wrangler](https://developers.cloudflare.com/workers/authorization/workers/#wrangler).
+
+### Rollback de código
+
+En Cloudflare, abrir **Workers & Pages → fbcv-calendar-manager → Deployments**,
+seleccionar una versión estable anterior y usar **Rollback**. Comprobar la web
+y `/api/meta` después. Esto revierte código y assets de esa versión, no datos
+de D1 ni revisiones. Corregir o revertir también el cambio en Git antes del
+siguiente push a `main`, porque el pipeline volverá a publicar el código del
+repositorio. No hay rollback automático si falla la comprobación posterior
+al despliegue.
+
 ## Probar Cloudflare en local
 
 ```sh
