@@ -6,6 +6,7 @@ import re
 from urllib.parse import urlsplit
 
 import scrapy
+from scrapy.exceptions import IgnoreRequest
 
 from .store import now
 
@@ -139,6 +140,18 @@ class CalendarSpider(scrapy.Spider):
         context = failure.request.meta
         # Exception messages may contain URLs/keys. Persist only safe classification.
         error = {"stage": context.get("stage"), "type": failure.type.__name__}
+        if failure.check(IgnoreRequest):
+            reason = failure.getErrorMessage()
+            error["reason"] = (
+                reason
+                if reason in {
+                    "Request outside reviewed source hosts",
+                    "Request outside public calendar API",
+                    "Forbidden by robots.txt",
+                }
+                else "Request rejected"
+            )
+            error["redirected"] = bool(context.get("redirect_urls"))
         if getattr(failure.value, "response", None) is not None:
             error["http_status"] = failure.value.response.status
         for key in ("type_id", "competition_id", "category_id", "group_id"):
