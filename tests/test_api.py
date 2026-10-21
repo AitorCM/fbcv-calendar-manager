@@ -186,3 +186,31 @@ class CalendarApiContracts(unittest.TestCase):
         match = groups["2601"]["rounds"][0]["matches"][0]
         self.assertEqual(match["starts_at"], "2026-10-15T21:00:00+02:00")
         self.assertTrue(match["home"])
+
+    def test_finished_llval_competitions_are_hidden_everywhere(self):
+        self.change_match(payload={"idField": "100"})
+        with self.store.db:
+            self.store.db.execute(
+                "UPDATE matches SET payload=json_set(payload,'$.idField','100') WHERE id='65180'"
+            )
+        self.assertEqual(len(self.client.get("/api/clubs/1715/conflicts").json()["items"]), 1)
+
+        def finish(group_id):
+            with self.store.db:
+                self.store.db.execute(
+                    "UPDATE groups SET payload=json_set(payload,'$.nameCategoryRegistered',' LLVAL Senior Masculino Primera ') WHERE id=?",
+                    (group_id,),
+                )
+
+        finish("2602")
+        calendar = self.client.get("/api/clubs/1715/teams/10318/calendar").json()
+        self.assertEqual([g["id"] for g in calendar["groups"]], ["2601"])
+        self.assertEqual(self.client.get("/api/clubs/1715/conflicts").json()["items"], [])
+        teams = self.client.get("/api/clubs/1715/teams").json()
+        self.assertEqual([(t["id"], t["match_count"]) for t in teams], [("10318", 1)])
+        self.assertEqual(
+            self.client.get("/api/clubs/1715/teams/10319/calendar").status_code, 404
+        )
+        finish("2601")
+        self.assertEqual(self.client.get("/api/clubs", params={"q": "norte"}).json(), [])
+        self.assertEqual(self.client.get("/api/clubs/1715/teams").json(), [])

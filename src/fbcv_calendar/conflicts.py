@@ -8,12 +8,14 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+from .store import LIVE_GROUP
+
 
 def detect_conflicts(conn, season, club):
     slots = defaultdict(list)
     skipped = 0
     rows = conn.execute(
-        "SELECT * FROM matches WHERE season=? AND active=1 AND (home_club_id=? OR away_club_id=?)",
+        f"SELECT * FROM matches WHERE season=? AND active=1 AND (home_club_id=? OR away_club_id=?) AND {LIVE_GROUP}",
         (season, club, club),
     )
     for row in rows:

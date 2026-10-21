@@ -16,6 +16,20 @@ def encode(value):
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
+# FBCV keeps finished competitions published. The app hides them so clubs only
+# see what is still being played; the crawler still stores them for coverage.
+FINISHED_CATEGORY_PREFIXES = ("LLVAL",)
+# SQL condition for a `matches` row whose group belongs to a live competition.
+LIVE_GROUP = (
+    "group_id NOT IN (SELECT g.id FROM groups g WHERE g.season=matches.season AND ("
+    + " OR ".join(
+        f"upper(trim(json_extract(g.payload,'$.nameCategoryRegistered'))) LIKE '{p}%'"
+        for p in FINISHED_CATEGORY_PREFIXES
+    )
+    + "))"
+)
+
+
 MATCH_FIELDS = (
     "idMatch",
     "idMatchCall",

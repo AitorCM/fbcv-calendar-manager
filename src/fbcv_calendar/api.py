@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StrictBool
 
 from .conflicts import detect_conflicts, review_connection, apply_reviews, save_review
+from .store import LIVE_GROUP
 
 
 class ReviewRequest(BaseModel):
@@ -55,11 +56,11 @@ def create_app(db_path=None, static_dir=None, review_path=None):
     def team_rows(conn, club, season):
         # Membership is based on active fixtures, not a possibly stale team name.
         return conn.execute(
-            """
+            f"""
           WITH memberships AS (
-            SELECT home_team_id AS team_id,group_id,id FROM matches WHERE season=? AND active=1 AND home_club_id=?
+            SELECT home_team_id AS team_id,group_id,id FROM matches WHERE season=? AND active=1 AND home_club_id=? AND {LIVE_GROUP}
             UNION ALL
-            SELECT away_team_id,group_id,id FROM matches WHERE season=? AND active=1 AND away_club_id=?
+            SELECT away_team_id,group_id,id FROM matches WHERE season=? AND active=1 AND away_club_id=? AND {LIVE_GROUP}
           )
           SELECT e.id,e.name,COUNT(DISTINCT m.id) AS match_count,COUNT(DISTINCT m.group_id) AS group_count,
                  GROUP_CONCAT(DISTINCT json_extract(g.payload,'$.nameCategoryRegistered')) AS categories
@@ -93,10 +94,10 @@ def create_app(db_path=None, static_dir=None, review_path=None):
             return [
                 dict(r)
                 for r in conn.execute(
-                    """
+                    f"""
               WITH memberships AS (
-                SELECT home_club_id club_id,home_team_id team_id FROM matches WHERE season=? AND active=1
-                UNION SELECT away_club_id,away_team_id FROM matches WHERE season=? AND active=1
+                SELECT home_club_id club_id,home_team_id team_id FROM matches WHERE season=? AND active=1 AND {LIVE_GROUP}
+                UNION SELECT away_club_id,away_team_id FROM matches WHERE season=? AND active=1 AND {LIVE_GROUP}
               )
               SELECT e.id,e.name,COUNT(DISTINCT m.team_id) team_count FROM memberships m
               JOIN entities e ON e.id=m.club_id AND e.kind='club' AND e.season=?
@@ -129,7 +130,7 @@ def create_app(db_path=None, static_dir=None, review_path=None):
                     404, "Este equipo no tiene calendario en el club seleccionado."
                 )
             fixtures = conn.execute(
-                "SELECT group_id,round,payload,starts_at FROM matches WHERE season=? AND active=1 AND (home_team_id=? OR away_team_id=?) ORDER BY starts_at,id",
+                f"SELECT group_id,round,payload,starts_at FROM matches WHERE season=? AND active=1 AND (home_team_id=? OR away_team_id=?) AND {LIVE_GROUP} ORDER BY starts_at,id",
                 (season, team_id, team_id),
             ).fetchall()
             group_ids = set(r["group_id"] for r in fixtures)
