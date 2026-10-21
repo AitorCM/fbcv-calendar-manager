@@ -1,0 +1,867 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-21T17:33:51+00:00",
+  "title": "Design System: En pista",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Cool Ground",
+        "canonical": "#eceef1",
+        "oklch": "oklch(94.8% 0.005 258.3)",
+        "tonalRamp": [
+          "oklch(15% 0.005 258.3)",
+          "oklch(26% 0.005 258.3)",
+          "oklch(38% 0.005 258.3)",
+          "oklch(50% 0.005 258.3)",
+          "oklch(62% 0.005 258.3)",
+          "oklch(74% 0.005 258.3)",
+          "oklch(85% 0.005 258.3)",
+          "oklch(95% 0.005 258.3)"
+        ],
+        "dark": "#121821"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(26% 0.000 89.9)",
+          "oklch(38% 0.000 89.9)",
+          "oklch(50% 0.000 89.9)",
+          "oklch(62% 0.000 89.9)",
+          "oklch(74% 0.000 89.9)",
+          "oklch(85% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ],
+        "dark": "#182029"
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Paper Hover",
+        "canonical": "#f4f5f7",
+        "oklch": "oklch(97.0% 0.003 264.5)",
+        "tonalRamp": [
+          "oklch(15% 0.003 264.5)",
+          "oklch(26% 0.003 264.5)",
+          "oklch(38% 0.003 264.5)",
+          "oklch(50% 0.003 264.5)",
+          "oklch(62% 0.003 264.5)",
+          "oklch(74% 0.003 264.5)",
+          "oklch(85% 0.003 264.5)",
+          "oklch(95% 0.003 264.5)"
+        ],
+        "dark": "#1e2732"
+      },
+      "surface-3": {
+        "role": "neutral",
+        "displayName": "Paper Pressed",
+        "canonical": "#e8ebef",
+        "oklch": "oklch(93.9% 0.006 255.5)",
+        "tonalRamp": [
+          "oklch(15% 0.006 255.5)",
+          "oklch(26% 0.006 255.5)",
+          "oklch(38% 0.006 255.5)",
+          "oklch(50% 0.006 255.5)",
+          "oklch(62% 0.006 255.5)",
+          "oklch(74% 0.006 255.5)",
+          "oklch(85% 0.006 255.5)",
+          "oklch(95% 0.006 255.5)"
+        ],
+        "dark": "#26303c"
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#dde1e6",
+        "oklch": "oklch(90.8% 0.008 253.9)",
+        "tonalRamp": [
+          "oklch(15% 0.008 253.9)",
+          "oklch(26% 0.008 253.9)",
+          "oklch(38% 0.008 253.9)",
+          "oklch(50% 0.008 253.9)",
+          "oklch(62% 0.008 253.9)",
+          "oklch(74% 0.008 253.9)",
+          "oklch(85% 0.008 253.9)",
+          "oklch(95% 0.008 253.9)"
+        ],
+        "dark": "#2b3542"
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Hairline Strong",
+        "canonical": "#c3c9d1",
+        "oklch": "oklch(83.4% 0.013 255.5)",
+        "tonalRamp": [
+          "oklch(15% 0.013 255.5)",
+          "oklch(26% 0.013 255.5)",
+          "oklch(38% 0.013 255.5)",
+          "oklch(50% 0.013 255.5)",
+          "oklch(62% 0.013 255.5)",
+          "oklch(74% 0.013 255.5)",
+          "oklch(85% 0.013 255.5)",
+          "oklch(95% 0.013 255.5)"
+        ],
+        "dark": "#3d4959"
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#12161b",
+        "oklch": "oklch(19.8% 0.012 254.1)",
+        "tonalRamp": [
+          "oklch(15% 0.012 254.1)",
+          "oklch(26% 0.012 254.1)",
+          "oklch(38% 0.012 254.1)",
+          "oklch(50% 0.012 254.1)",
+          "oklch(62% 0.012 254.1)",
+          "oklch(74% 0.012 254.1)",
+          "oklch(85% 0.012 254.1)",
+          "oklch(95% 0.012 254.1)"
+        ],
+        "dark": "#e7ebf0"
+      },
+      "text-2": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "#444d58",
+        "oklch": "oklch(41.6% 0.022 253.5)",
+        "tonalRamp": [
+          "oklch(15% 0.022 253.5)",
+          "oklch(26% 0.022 253.5)",
+          "oklch(38% 0.022 253.5)",
+          "oklch(50% 0.022 253.5)",
+          "oklch(62% 0.022 253.5)",
+          "oklch(74% 0.022 253.5)",
+          "oklch(85% 0.022 253.5)",
+          "oklch(95% 0.022 253.5)"
+        ],
+        "dark": "#b0bac7"
+      },
+      "text-3": {
+        "role": "neutral",
+        "displayName": "Ink Tertiary",
+        "canonical": "#636c78",
+        "oklch": "oklch(52.8% 0.022 255.6)",
+        "tonalRamp": [
+          "oklch(15% 0.022 255.6)",
+          "oklch(26% 0.022 255.6)",
+          "oklch(38% 0.022 255.6)",
+          "oklch(50% 0.022 255.6)",
+          "oklch(62% 0.022 255.6)",
+          "oklch(74% 0.022 255.6)",
+          "oklch(85% 0.022 255.6)",
+          "oklch(95% 0.022 255.6)"
+        ],
+        "dark": "#8b97a6"
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Basketball Orange",
+        "canonical": "#c2410c",
+        "oklch": "oklch(55.3% 0.174 38.4)",
+        "tonalRamp": [
+          "oklch(15% 0.174 38.4)",
+          "oklch(26% 0.174 38.4)",
+          "oklch(38% 0.174 38.4)",
+          "oklch(50% 0.174 38.4)",
+          "oklch(62% 0.174 38.4)",
+          "oklch(74% 0.174 38.4)",
+          "oklch(85% 0.174 38.4)",
+          "oklch(95% 0.174 38.4)"
+        ],
+        "dark": "#ff8a4c"
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Burnt Orange",
+        "canonical": "#a5370a",
+        "oklch": "oklch(49.2% 0.153 38.6)",
+        "tonalRamp": [
+          "oklch(15% 0.153 38.6)",
+          "oklch(26% 0.153 38.6)",
+          "oklch(38% 0.153 38.6)",
+          "oklch(50% 0.153 38.6)",
+          "oklch(62% 0.153 38.6)",
+          "oklch(74% 0.153 38.6)",
+          "oklch(85% 0.153 38.6)",
+          "oklch(95% 0.153 38.6)"
+        ],
+        "dark": "#ffa173"
+      },
+      "accent-contrast": {
+        "role": "primary",
+        "displayName": "On Orange",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(26% 0.000 89.9)",
+          "oklch(38% 0.000 89.9)",
+          "oklch(50% 0.000 89.9)",
+          "oklch(62% 0.000 89.9)",
+          "oklch(74% 0.000 89.9)",
+          "oklch(85% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ],
+        "dark": "#12161b"
+      },
+      "accent-ink": {
+        "role": "primary",
+        "displayName": "Orange Ink",
+        "canonical": "#9a3412",
+        "oklch": "oklch(47.0% 0.143 37.3)",
+        "tonalRamp": [
+          "oklch(15% 0.143 37.3)",
+          "oklch(26% 0.143 37.3)",
+          "oklch(38% 0.143 37.3)",
+          "oklch(50% 0.143 37.3)",
+          "oklch(62% 0.143 37.3)",
+          "oklch(74% 0.143 37.3)",
+          "oklch(85% 0.143 37.3)",
+          "oklch(95% 0.143 37.3)"
+        ],
+        "dark": "#ffa173"
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Orange Wash",
+        "canonical": "#fdeee4",
+        "oklch": "oklch(95.8% 0.021 56.1)",
+        "tonalRamp": [
+          "oklch(15% 0.021 56.1)",
+          "oklch(26% 0.021 56.1)",
+          "oklch(38% 0.021 56.1)",
+          "oklch(50% 0.021 56.1)",
+          "oklch(62% 0.021 56.1)",
+          "oklch(74% 0.021 56.1)",
+          "oklch(85% 0.021 56.1)",
+          "oklch(95% 0.021 56.1)"
+        ],
+        "dark": "#33221a"
+      },
+      "selection": {
+        "role": "primary",
+        "displayName": "Selection Peach",
+        "canonical": "#fbd3b8",
+        "oklch": "oklch(89.4% 0.058 55.9)",
+        "tonalRamp": [
+          "oklch(15% 0.058 55.9)",
+          "oklch(26% 0.058 55.9)",
+          "oklch(38% 0.058 55.9)",
+          "oklch(50% 0.058 55.9)",
+          "oklch(62% 0.058 55.9)",
+          "oklch(74% 0.058 55.9)",
+          "oklch(85% 0.058 55.9)",
+          "oklch(95% 0.058 55.9)"
+        ],
+        "dark": "#5a2e14"
+      },
+      "shell": {
+        "role": "secondary",
+        "displayName": "Scoreboard Housing",
+        "canonical": "#0d1117",
+        "oklch": "oklch(17.6% 0.014 258.4)",
+        "tonalRamp": [
+          "oklch(15% 0.014 258.4)",
+          "oklch(26% 0.014 258.4)",
+          "oklch(38% 0.014 258.4)",
+          "oklch(50% 0.014 258.4)",
+          "oklch(62% 0.014 258.4)",
+          "oklch(74% 0.014 258.4)",
+          "oklch(85% 0.014 258.4)",
+          "oklch(95% 0.014 258.4)"
+        ],
+        "dark": "#05070a"
+      },
+      "shell-2": {
+        "role": "secondary",
+        "displayName": "Housing Raised",
+        "canonical": "#1a212b",
+        "oklch": "oklch(24.6% 0.022 257.3)",
+        "tonalRamp": [
+          "oklch(15% 0.022 257.3)",
+          "oklch(26% 0.022 257.3)",
+          "oklch(38% 0.022 257.3)",
+          "oklch(50% 0.022 257.3)",
+          "oklch(62% 0.022 257.3)",
+          "oklch(74% 0.022 257.3)",
+          "oklch(85% 0.022 257.3)",
+          "oklch(95% 0.022 257.3)"
+        ],
+        "dark": "#141a22"
+      },
+      "shell-line": {
+        "role": "secondary",
+        "displayName": "Housing Seam",
+        "canonical": "#2a3340",
+        "oklch": "oklch(31.8% 0.026 257.5)",
+        "tonalRamp": [
+          "oklch(15% 0.026 257.5)",
+          "oklch(26% 0.026 257.5)",
+          "oklch(38% 0.026 257.5)",
+          "oklch(50% 0.026 257.5)",
+          "oklch(62% 0.026 257.5)",
+          "oklch(74% 0.026 257.5)",
+          "oklch(85% 0.026 257.5)",
+          "oklch(95% 0.026 257.5)"
+        ],
+        "dark": "#222a35"
+      },
+      "shell-text": {
+        "role": "secondary",
+        "displayName": "Housing Text",
+        "canonical": "#eef1f5",
+        "oklch": "oklch(95.7% 0.006 255.5)",
+        "tonalRamp": [
+          "oklch(15% 0.006 255.5)",
+          "oklch(26% 0.006 255.5)",
+          "oklch(38% 0.006 255.5)",
+          "oklch(50% 0.006 255.5)",
+          "oklch(62% 0.006 255.5)",
+          "oklch(74% 0.006 255.5)",
+          "oklch(85% 0.006 255.5)",
+          "oklch(95% 0.006 255.5)"
+        ],
+        "dark": "unchanged"
+      },
+      "shell-text-2": {
+        "role": "secondary",
+        "displayName": "Housing Muted",
+        "canonical": "#a2adbb",
+        "oklch": "oklch(74.3% 0.024 254.4)",
+        "tonalRamp": [
+          "oklch(15% 0.024 254.4)",
+          "oklch(26% 0.024 254.4)",
+          "oklch(38% 0.024 254.4)",
+          "oklch(50% 0.024 254.4)",
+          "oklch(62% 0.024 254.4)",
+          "oklch(74% 0.024 254.4)",
+          "oklch(85% 0.024 254.4)",
+          "oklch(95% 0.024 254.4)"
+        ],
+        "dark": "unchanged"
+      },
+      "led": {
+        "role": "tertiary",
+        "displayName": "LED Amber",
+        "canonical": "#ffb224",
+        "oklch": "oklch(81.7% 0.164 75.8)",
+        "tonalRamp": [
+          "oklch(15% 0.164 75.8)",
+          "oklch(26% 0.164 75.8)",
+          "oklch(38% 0.164 75.8)",
+          "oklch(50% 0.164 75.8)",
+          "oklch(62% 0.164 75.8)",
+          "oklch(74% 0.164 75.8)",
+          "oklch(85% 0.164 75.8)",
+          "oklch(95% 0.164 75.8)"
+        ],
+        "dark": "unchanged"
+      },
+      "led-ghost": {
+        "role": "tertiary",
+        "displayName": "Unlit Segment",
+        "canonical": "rgb(255 178 36 / 0.09)",
+        "oklch": "oklch(81.7% 0.164 75.8)",
+        "tonalRamp": [
+          "oklch(15% 0.164 75.8)",
+          "oklch(26% 0.164 75.8)",
+          "oklch(38% 0.164 75.8)",
+          "oklch(50% 0.164 75.8)",
+          "oklch(62% 0.164 75.8)",
+          "oklch(74% 0.164 75.8)",
+          "oklch(85% 0.164 75.8)",
+          "oklch(95% 0.164 75.8)"
+        ],
+        "dark": "unchanged"
+      },
+      "led-win": {
+        "role": "tertiary",
+        "displayName": "LED Win Green",
+        "canonical": "#5ee08f",
+        "oklch": "oklch(81.4% 0.163 153.3)",
+        "tonalRamp": [
+          "oklch(15% 0.163 153.3)",
+          "oklch(26% 0.163 153.3)",
+          "oklch(38% 0.163 153.3)",
+          "oklch(50% 0.163 153.3)",
+          "oklch(62% 0.163 153.3)",
+          "oklch(74% 0.163 153.3)",
+          "oklch(85% 0.163 153.3)",
+          "oklch(95% 0.163 153.3)"
+        ],
+        "dark": "unchanged"
+      },
+      "led-loss": {
+        "role": "tertiary",
+        "displayName": "LED Loss Red",
+        "canonical": "#ff7b72",
+        "oklch": "oklch(73.4% 0.163 25.8)",
+        "tonalRamp": [
+          "oklch(15% 0.163 25.8)",
+          "oklch(26% 0.163 25.8)",
+          "oklch(38% 0.163 25.8)",
+          "oklch(50% 0.163 25.8)",
+          "oklch(62% 0.163 25.8)",
+          "oklch(74% 0.163 25.8)",
+          "oklch(85% 0.163 25.8)",
+          "oklch(95% 0.163 25.8)"
+        ],
+        "dark": "unchanged"
+      },
+      "home": {
+        "role": "state",
+        "displayName": "Home Green",
+        "canonical": "#0b6b4f",
+        "oklch": "oklch(47.0% 0.094 166.5)",
+        "tonalRamp": [
+          "oklch(15% 0.094 166.5)",
+          "oklch(26% 0.094 166.5)",
+          "oklch(38% 0.094 166.5)",
+          "oklch(50% 0.094 166.5)",
+          "oklch(62% 0.094 166.5)",
+          "oklch(74% 0.094 166.5)",
+          "oklch(85% 0.094 166.5)",
+          "oklch(95% 0.094 166.5)"
+        ],
+        "dark": "#6fd6a8"
+      },
+      "home-bg": {
+        "role": "state",
+        "displayName": "Home Tint",
+        "canonical": "#e2f3ec",
+        "oklch": "oklch(95.0% 0.020 169.3)",
+        "tonalRamp": [
+          "oklch(15% 0.020 169.3)",
+          "oklch(26% 0.020 169.3)",
+          "oklch(38% 0.020 169.3)",
+          "oklch(50% 0.020 169.3)",
+          "oklch(62% 0.020 169.3)",
+          "oklch(74% 0.020 169.3)",
+          "oklch(85% 0.020 169.3)",
+          "oklch(95% 0.020 169.3)"
+        ],
+        "dark": "#10291f"
+      },
+      "away": {
+        "role": "state",
+        "displayName": "Away Slate",
+        "canonical": "#3d4a5c",
+        "oklch": "oklch(40.5% 0.035 256.6)",
+        "tonalRamp": [
+          "oklch(15% 0.035 256.6)",
+          "oklch(26% 0.035 256.6)",
+          "oklch(38% 0.035 256.6)",
+          "oklch(50% 0.035 256.6)",
+          "oklch(62% 0.035 256.6)",
+          "oklch(74% 0.035 256.6)",
+          "oklch(85% 0.035 256.6)",
+          "oklch(95% 0.035 256.6)"
+        ],
+        "dark": "#b6c2d2"
+      },
+      "away-bg": {
+        "role": "state",
+        "displayName": "Away Tint",
+        "canonical": "#eaeef3",
+        "oklch": "oklch(94.8% 0.008 253.9)",
+        "tonalRamp": [
+          "oklch(15% 0.008 253.9)",
+          "oklch(26% 0.008 253.9)",
+          "oklch(38% 0.008 253.9)",
+          "oklch(50% 0.008 253.9)",
+          "oklch(62% 0.008 253.9)",
+          "oklch(74% 0.008 253.9)",
+          "oklch(85% 0.008 253.9)",
+          "oklch(95% 0.008 253.9)"
+        ],
+        "dark": "#26303c"
+      },
+      "danger": {
+        "role": "state",
+        "displayName": "Danger",
+        "canonical": "#b42318",
+        "oklch": "oklch(50.0% 0.182 29.5)",
+        "tonalRamp": [
+          "oklch(15% 0.182 29.5)",
+          "oklch(26% 0.182 29.5)",
+          "oklch(38% 0.182 29.5)",
+          "oklch(50% 0.182 29.5)",
+          "oklch(62% 0.182 29.5)",
+          "oklch(74% 0.182 29.5)",
+          "oklch(85% 0.182 29.5)",
+          "oklch(95% 0.182 29.5)"
+        ],
+        "dark": "#ff8f86"
+      },
+      "danger-bg": {
+        "role": "state",
+        "displayName": "Danger Tint",
+        "canonical": "#fdecea",
+        "oklch": "oklch(95.6% 0.019 25.6)",
+        "tonalRamp": [
+          "oklch(15% 0.019 25.6)",
+          "oklch(26% 0.019 25.6)",
+          "oklch(38% 0.019 25.6)",
+          "oklch(50% 0.019 25.6)",
+          "oklch(62% 0.019 25.6)",
+          "oklch(74% 0.019 25.6)",
+          "oklch(85% 0.019 25.6)",
+          "oklch(95% 0.019 25.6)"
+        ],
+        "dark": "#2d1514"
+      },
+      "warning": {
+        "role": "state",
+        "displayName": "Warning",
+        "canonical": "#8a4b06",
+        "oklch": "oklch(47.9% 0.111 58.9)",
+        "tonalRamp": [
+          "oklch(15% 0.111 58.9)",
+          "oklch(26% 0.111 58.9)",
+          "oklch(38% 0.111 58.9)",
+          "oklch(50% 0.111 58.9)",
+          "oklch(62% 0.111 58.9)",
+          "oklch(74% 0.111 58.9)",
+          "oklch(85% 0.111 58.9)",
+          "oklch(95% 0.111 58.9)"
+        ],
+        "dark": "#f3c063"
+      },
+      "warning-bg": {
+        "role": "state",
+        "displayName": "Warning Tint",
+        "canonical": "#fdf2d8",
+        "oklch": "oklch(96.3% 0.036 87.8)",
+        "tonalRamp": [
+          "oklch(15% 0.036 87.8)",
+          "oklch(26% 0.036 87.8)",
+          "oklch(38% 0.036 87.8)",
+          "oklch(50% 0.036 87.8)",
+          "oklch(62% 0.036 87.8)",
+          "oklch(74% 0.036 87.8)",
+          "oklch(85% 0.036 87.8)",
+          "oklch(95% 0.036 87.8)"
+        ],
+        "dark": "#2b2111"
+      },
+      "success": {
+        "role": "state",
+        "displayName": "Success",
+        "canonical": "#12733e",
+        "oklch": "oklch(49.0% 0.119 153.0)",
+        "tonalRamp": [
+          "oklch(15% 0.119 153.0)",
+          "oklch(26% 0.119 153.0)",
+          "oklch(38% 0.119 153.0)",
+          "oklch(50% 0.119 153.0)",
+          "oklch(62% 0.119 153.0)",
+          "oklch(74% 0.119 153.0)",
+          "oklch(85% 0.119 153.0)",
+          "oklch(95% 0.119 153.0)"
+        ],
+        "dark": "#6fd6a8"
+      },
+      "success-bg": {
+        "role": "state",
+        "displayName": "Success Tint",
+        "canonical": "#e3f4ea",
+        "oklch": "oklch(95.2% 0.022 160.2)",
+        "tonalRamp": [
+          "oklch(15% 0.022 160.2)",
+          "oklch(26% 0.022 160.2)",
+          "oklch(38% 0.022 160.2)",
+          "oklch(50% 0.022 160.2)",
+          "oklch(62% 0.022 160.2)",
+          "oklch(74% 0.022 160.2)",
+          "oklch(85% 0.022 160.2)",
+          "oklch(95% 0.022 160.2)"
+        ],
+        "dark": "#10291f"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Only the welcome heading ¿De qué club eres?; 1.875rem below 720px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Selected team's name above its calendar; 1.375rem on phones."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "View titles and pane titles."
+      },
+      "team-strip": {
+        "displayName": "Team Strip",
+        "purpose": "Team names in board rows; condensed scoreboard lettering."
+      },
+      "scoreboard-name": {
+        "displayName": "Scoreboard Name",
+        "purpose": "Uppercase home/away names inside the scoreboard panel; 1.125rem on phones."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default running text at normal width."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Buttons, metadata, meta lines."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase board day headings."
+      },
+      "tile-label": {
+        "displayName": "Tile Label",
+        "purpose": "Uppercase word above LED digits on time tiles."
+      }
+    },
+    "fontLoading": {
+      "package": "@fontsource-variable/archivo",
+      "import": "@fontsource-variable/archivo/wdth.css",
+      "axes": [
+        "wght",
+        "wdth"
+      ]
+    },
+    "themes": {
+      "attribute": "data-theme on <html>",
+      "values": [
+        "light",
+        "dark"
+      ],
+      "storageKey": "fbcv-theme",
+      "fallback": "prefers-color-scheme",
+      "themeColorMeta": "#0d1117"
+    },
+    "shadows": [
+      {
+        "name": "pop",
+        "value": "0 12px 32px -8px rgb(13 17 23 / 0.28), 0 2px 6px rgb(13 17 23 / 0.08)",
+        "dark": "0 16px 40px -8px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.4)",
+        "purpose": "Floating layers only: club switcher panel and toast."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 3px var(--accent-soft)",
+        "purpose": "Search field focus-within, paired with an orange border."
+      }
+    ],
+    "focus": [
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px",
+        "purpose": "Global :focus-visible. Rows use offset -2px; selects/date/textarea use offset 0 plus an orange border."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms ease-out",
+        "purpose": "Background, border and colour changes on buttons, rows, chips, inputs."
+      },
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Entrances: switcher pop-in (160ms, from -6px) and toast rise (200ms, from +8px)."
+      },
+      {
+        "name": "led-on",
+        "value": "520ms steps(4, end)",
+        "purpose": "One-time power-on flicker of large seven-segment digits (lit, ghost, lit)."
+      },
+      {
+        "name": "shimmer",
+        "value": "1.3s ease-in-out infinite",
+        "purpose": "Skeleton loading bars."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation/transition durations forced to 1ms",
+        "purpose": "Global prefers-reduced-motion override."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop",
+        "value": "720px",
+        "purpose": "Gutter 16px to 32px, row reflow, large digit 40px to 56px, season readout shown."
+      },
+      {
+        "name": "two-pane",
+        "value": "960px",
+        "purpose": "Equipos view becomes a 300px sticky list beside the calendar."
+      }
+    ],
+    "sevenSegment": {
+      "glyphCell": "12 x 22 units, 3-unit tracking, 2.4 segment thickness, 0.5 gap, skewX(-6deg)",
+      "heights": {
+        "sm": "16px",
+        "md": "22px",
+        "lg": "40px",
+        "lg-desktop": "56px"
+      },
+      "glyphs": "0-9, '-', ':', '.', space",
+      "unlit": "var(--led-ghost)"
+    },
+    "iconography": {
+      "grid": "20px",
+      "stroke": "1.75",
+      "caps": "round",
+      "joins": "round",
+      "default": "outline",
+      "filled": "star when followed",
+      "sizes": [
+        "14px footer",
+        "16px inline",
+        "18px in buttons",
+        "20px default",
+        "28px empty states"
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main action: add to calendar, retry, mark resolved.",
+      "html": "<button class=\"ds-btn ds-btn-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 20 20\"><rect x=\"3\" y=\"4.5\" width=\"14\" height=\"12\" rx=\"2\"/><path d=\"M3 8.5h14M7 2.8v3.4M13 2.8v3.4M10 10.5v4M8 12.5h4\"/></svg>Añadir al calendario</button>",
+      "css": ".ds-btn{font-family:var(--font);display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid transparent;border-radius:var(--radius-sm);font-size:.875rem;font-weight:620;cursor:pointer;transition:background-color 150ms ease-out,border-color 150ms ease-out,color 150ms ease-out}.ds-icon{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}.ds-btn-primary{background:var(--accent);color:var(--accent-contrast)}.ds-btn-primary:hover{background:var(--accent-hover)}.ds-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Paper button with strong hairline for secondary actions; icon turns orange when toggled on.",
+      "html": "<button class=\"ds-btn2\"><svg class=\"ds-icon2\" viewBox=\"0 0 20 20\"><path d=\"m10 2.8 2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L2.8 8.1l5-.7Z\"/></svg>Seguir equipo</button>",
+      "css": ".ds-btn2{font-family:var(--font);display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:.875rem;font-weight:620;cursor:pointer;transition:background-color 150ms ease-out,border-color 150ms ease-out}.ds-btn2:hover{background:var(--surface-2);border-color:var(--text-3)}.ds-btn2:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.ds-icon2{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linejoin:round}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Club and team search; orange border and wash halo on focus.",
+      "html": "<label class=\"ds-search\"><svg class=\"ds-icon3\" viewBox=\"0 0 20 20\"><circle cx=\"9\" cy=\"9\" r=\"5.5\"/><path d=\"m13 13 4.5 4.5\"/></svg><input type=\"search\" placeholder=\"Busca tu club\"></label>",
+      "css": ".ds-search{font-family:var(--font);display:flex;align-items:center;gap:10px;min-height:52px;padding:0 8px 0 14px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--surface);color:var(--text-3);transition:border-color 150ms ease-out,box-shadow 150ms ease-out}.ds-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}.ds-search input{flex:1;min-width:0;height:48px;border:0;outline:0;background:none;color:var(--text);font:inherit;font-size:1.0625rem}.ds-icon3{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round}"
+    },
+    {
+      "name": "Tabs",
+      "kind": "nav",
+      "refersTo": "tabs",
+      "description": "Sticky view tabs; current tab carries a 3px orange bar on the hairline.",
+      "html": "<nav class=\"ds-tabs\"><a href=\"#\" aria-current=\"page\">Próximos</a><a href=\"#\">Equipos</a><a href=\"#\">Incompatibilidades</a></nav>",
+      "css": ".ds-tabs{font-family:var(--font);display:flex;gap:24px;background:var(--surface);border-bottom:1px solid var(--line);padding:0 16px}.ds-tabs a{position:relative;padding:12px 0 13px;color:var(--text-2);font-size:.9375rem;font-weight:620;text-decoration:none}.ds-tabs a:hover,.ds-tabs a[aria-current=page]{color:var(--text)}.ds-tabs a[aria-current=page]::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}.ds-tabs a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "refersTo": "segmented-option-on",
+      "description": "Paper tray of options; the pressed option fills with housing black.",
+      "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">Esta semana</button><button aria-pressed=\"false\">Todo</button></div>",
+      "css": ".ds-seg{font-family:var(--font);display:inline-flex;padding:3px;gap:2px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface)}.ds-seg button{font:inherit;min-height:34px;padding:0 12px;border:0;border-radius:5px;background:transparent;color:var(--text-2);font-size:.875rem;font-weight:600;cursor:pointer;transition:background-color 150ms ease-out,color 150ms ease-out}.ds-seg button:hover{background:var(--surface-2);color:var(--text)}.ds-seg button[aria-pressed=true]{background:var(--shell);color:var(--shell-text)}.ds-seg button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}"
+    },
+    {
+      "name": "Side Pills and Tags",
+      "kind": "chip",
+      "refersTo": "side-pill-home",
+      "description": "Paired tint/ink state pills: Local and Visitante.",
+      "html": "<span class=\"ds-pill ds-home\">Local</span> <span class=\"ds-pill ds-away\">Visitante</span> <span class=\"ds-tag ds-warn\">Menos de 2 h</span> <span class=\"ds-tag ds-ok\">Revisado</span>",
+      "css": ".ds-pill{font-family:var(--font);padding:2px 7px;border-radius:5px;font-size:.6875rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}.ds-home{background:var(--home-bg);color:var(--home)}.ds-away{background:var(--away-bg);color:var(--away)}.ds-tag{font-family:var(--font);padding:3px 8px;border-radius:5px;font-size:.75rem;font-weight:680}.ds-warn{background:var(--warning-bg);color:var(--warning)}.ds-ok{background:var(--success-bg);color:var(--success)}"
+    },
+    {
+      "name": "Fixture Board",
+      "kind": "card",
+      "refersTo": "board",
+      "description": "Departures-style board: LED time tile, team, rival, venue in fixed columns divided by hairlines.",
+      "html": "<ul class=\"ds-board\"><li class=\"ds-row\"><div class=\"ds-tile\"><svg viewBox=\"0 0 60 24\" height=\"22\"><text x=\"2\" y=\"19\" font-size=\"20\" fill=\"currentColor\" font-family=\"sans-serif\">18:30</text></svg></div><div><b class=\"ds-team\">Infantil Masculino A</b><small>Infantil · Primera</small></div><div class=\"ds-rival\"><span class=\"ds-pill ds-home\">Local</span> CB Patacona</div><div><span>Pabellón Municipal</span><small>Alboraya</small></div></li><li class=\"ds-row\"><div class=\"ds-tile\"><span class=\"ds-tl\">Por confirmar</span>--:--</div><div><b class=\"ds-team\">Cadete Femenino</b><small>Cadete · Preferente</small></div><div class=\"ds-rival\"><span class=\"ds-pill ds-away\">Visitante</span> CB Paterna</div><div><span class=\"ds-pend\">Pabellón por confirmar</span></div></li></ul>",
+      "css": ".ds-board{font-family:var(--font);margin:0;padding:0;list-style:none;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden}.ds-row{display:grid;grid-template-columns:auto 1.25fr 1.25fr 1fr;align-items:center;gap:18px;padding:10px 12px 10px 10px;transition:background-color 150ms ease-out}.ds-row+.ds-row{border-top:1px solid var(--line)}.ds-row:hover{background:var(--surface-2)}.ds-row small{display:block;color:var(--text-3);font-size:.8125rem}.ds-team{font-size:1.0625rem;font-weight:720;font-variation-settings:'wdth' 82;color:var(--text)}.ds-rival{color:var(--text-2);font-weight:560;font-variation-settings:'wdth' 88}.ds-tile{display:grid;justify-items:center;gap:4px;min-width:88px;padding:7px 10px 8px;border-radius:var(--radius-sm);background:var(--shell);color:var(--led)}.ds-tl{color:var(--shell-text-2);font-size:.6875rem;font-weight:650;letter-spacing:.05em;text-transform:uppercase}.ds-pill{padding:2px 7px;border-radius:5px;font-size:.6875rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}.ds-home{background:var(--home-bg);color:var(--home)}.ds-away{background:var(--away-bg);color:var(--away)}.ds-pend{color:var(--warning);font-size:.8125rem;font-weight:600}"
+    },
+    {
+      "name": "Time Tile",
+      "kind": "custom",
+      "refersTo": "time-tile",
+      "description": "Housing-black cell with seven-segment LED digits; ghosted unlit segments; win/loss recolours the digits.",
+      "html": "<div class=\"ds-tt\"><span class=\"ds-ttl\">Victoria</span><svg class=\"ds-seg\" viewBox=\"-1 -1 44 24\"><g transform=\"skewX(-6) translate(1.4 0)\"><g><polygon class=\"on\" points=\"1.7,1.2 2.9,0 9.1,0 10.3,1.2 9.1,2.4 2.9,2.4\"/><polygon class=\"on\" points=\"10.8,1.7 12,2.9 12,9.3 10.8,10.5 9.6,9.3 9.6,2.9\"/><polygon class=\"on\" points=\"10.8,11.5 12,12.7 12,19.1 10.8,20.3 9.6,19.1 9.6,12.7\"/><polygon class=\"off\" points=\"1.7,20.8 2.9,19.6 9.1,19.6 10.3,20.8 9.1,22 2.9,22\"/><polygon class=\"off\" points=\"1.2,11.5 2.4,12.7 2.4,19.1 1.2,20.3 0,19.1 0,12.7\"/><polygon class=\"off\" points=\"1.2,1.7 2.4,2.9 2.4,9.3 1.2,10.5 0,9.3 0,2.9\"/><polygon class=\"off\" points=\"1.7,11 2.9,9.8 9.1,9.8 10.3,11 9.1,12.2 2.9,12.2\"/></g><g transform=\"translate(15 0)\"><polygon class=\"off\" points=\"1.7,1.2 2.9,0 9.1,0 10.3,1.2 9.1,2.4 2.9,2.4\"/><polygon class=\"off\" points=\"10.8,1.7 12,2.9 12,9.3 10.8,10.5 9.6,9.3 9.6,2.9\"/><polygon class=\"off\" points=\"10.8,11.5 12,12.7 12,19.1 10.8,20.3 9.6,19.1 9.6,12.7\"/><polygon class=\"off\" points=\"1.7,20.8 2.9,19.6 9.1,19.6 10.3,20.8 9.1,22 2.9,22\"/><polygon class=\"off\" points=\"1.2,11.5 2.4,12.7 2.4,19.1 1.2,20.3 0,19.1 0,12.7\"/><polygon class=\"off\" points=\"1.2,1.7 2.4,2.9 2.4,9.3 1.2,10.5 0,9.3 0,2.9\"/><polygon class=\"on\" points=\"1.7,11 2.9,9.8 9.1,9.8 10.3,11 9.1,12.2 2.9,12.2\"/></g></g></svg></div>",
+      "css": ".ds-tt{font-family:var(--font);display:inline-grid;justify-items:center;gap:4px;min-width:88px;padding:7px 10px 8px;border-radius:var(--radius-sm);background:var(--shell);color:var(--led-win)}.ds-ttl{color:var(--shell-text-2);font-size:.6875rem;font-weight:650;letter-spacing:.05em;line-height:1;text-transform:uppercase}.ds-seg{height:22px;width:auto;overflow:visible}.ds-seg .on{fill:currentColor}.ds-seg .off{fill:var(--led-ghost)}"
+    },
+    {
+      "name": "Scoreboard Panel",
+      "kind": "custom",
+      "refersTo": "scoreboard",
+      "description": "The team's next match as a scoreboard: amber kind label, home | LED clock | away, venue footer.",
+      "html": "<section class=\"ds-sb\"><div class=\"ds-sbh\"><span class=\"ds-kind\">Próximo partido</span><span>sábado, 24 de octubre</span></div><div class=\"ds-sbb\"><div><span class=\"ds-side\">Local</span><strong class=\"own\">CB Alboraya</strong></div><div class=\"ds-clock\">18:30</div><div class=\"ds-away\"><span class=\"ds-side\">Visitante</span><strong>CB Paterna</strong></div></div><div class=\"ds-sbf\">Pabellón Municipal <small>Alboraya</small></div></section>",
+      "css": ".ds-sb{font-family:var(--font);display:grid;gap:14px;padding:16px 20px 14px;border-radius:12px;background:var(--shell);color:var(--shell-text)}.ds-sbh{display:flex;justify-content:space-between;color:var(--shell-text-2);font-size:.8125rem;font-weight:600}.ds-kind{color:var(--led);letter-spacing:.08em;text-transform:uppercase}.ds-sbb{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px}.ds-sbb>div{display:grid;gap:4px}.ds-away{text-align:right}.ds-side{color:var(--shell-text-2);font-size:.6875rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}.ds-sbb strong{font-size:1.375rem;line-height:1.1;font-weight:740;font-variation-settings:'wdth' 72;text-transform:uppercase}.ds-sbb strong.own{color:var(--led)}.ds-clock{padding:10px 16px;border:1px solid var(--shell-line);border-radius:var(--radius-sm);color:var(--led);font-size:2rem;font-weight:700}.ds-sbf{padding-top:12px;border-top:1px solid var(--shell-line);font-size:.9375rem;font-weight:560}.ds-sbf small{color:var(--shell-text-2)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Pabellón Scoreboard",
+    "overview": "En pista looks like the scoreboard every family already trusts in a sports hall. A near-black housing (the shell) carries the things that are *lit*: the 56px header, the next-match panel, and every time tile. Inside the housing, kick-off times and final scores are drawn as amber seven-segment LED digits whose unlit segments stay faintly visible. Everything outside the housing is a calm, cool-grey working list: dense, hairline-divided, readable at a glance.\n\nThe system is built from one variable family, Archivo, used at different widths: condensed for team names and scoreboard strips, normal width for running text. Colour is disciplined by job: amber LED means \"this is a readout\", basketball orange means \"you can act on this or you have selected it\", and the green/red/amber state pairs mean exactly one thing each. Depth comes from the shell's darkness against the light ground and from hairline borders, not from shadows.\n\nBoth themes share the same housing: in dark mode the ground and surfaces sink toward the shell, the orange brightens to stay legible, and the LED colours do not change.",
+    "keyCharacteristics": [
+      "Dark scoreboard housing with amber seven-segment LED digits for times and scores.",
+      "Departures-board lists: fixed-column rows inside one bordered board, divided by hairlines.",
+      "One variable sans (Archivo) whose width axis carries hierarchy: condensed for names, normal for prose.",
+      "Basketball orange reserved for actions, selection, and the active tab.",
+      "Flat surfaces; shadows only on floating layers (switcher panel, toast).",
+      "Light and dark themes with identical structure."
+    ],
+    "rules": [
+      {
+        "name": "The Two Lights Rule",
+        "body": "LED amber is for readouts. Orange is for things you can press or have selected. Never use LED amber for an action control, and never use orange for a time or score.",
+        "section": "colors"
+      },
+      {
+        "name": "The Paired State Rule",
+        "body": "State colours always appear as a tint background with its own ink (home-bg/home, warning-bg/warning). Don't put state ink on paper as bare text, except the warning ink of \"por confirmar\" text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Width Axis Rule",
+        "body": "Hierarchy for names comes from the width axis: the narrower the setting (72 to 90), the more \"scoreboard\" the text is. Body copy stays at `wdth` 100. Don't load a second family for display.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Numbers Rule",
+        "body": "Every count, date, and meta line with numbers uses `font-variant-numeric: tabular-nums` so columns of figures don't jitter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lit Digits Rule",
+        "body": "Kick-off times and scores are never typeset. They render through the seven-segment component, at fixed whole-pixel heights (16px small, 22px default, 40px large, 56px large on desktop), on the shell.",
+        "section": "typography"
+      },
+      {
+        "name": "The Departures Board Rule",
+        "body": "A list of matches is one bordered board with hairline dividers between fixed-column rows, ordered by day and time. Don't put each match in its own card.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Board Rule",
+        "body": "Boards, cards, tiles and the scoreboard never cast shadows. If it doesn't float over content, it has no shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** draw every kick-off time and score with the seven-segment component on the housing black, at its fixed pixel heights (16, 22, 40, 56px).",
+      "**Do** keep unlit segments visible at 9% amber; the ghost is part of the readout.",
+      "**Do** set team and rival names in condensed Archivo (`wdth` 72 to 90) and prose at `wdth` 100.",
+      "**Do** list matches as rows in one hairline-divided board, ordered by day then time.",
+      "**Do** show unknown time or venue as an explicit state: \"--:--\" with \"Por confirmar\" on the tile, warning-ink \"por confirmar\" text for venues.",
+      "**Do** use the 2px orange focus outline (2px offset, inset on rows) on every interactive element.",
+      "**Do** honour reduced motion: the global reduced-motion rule collapses animations and transitions to 1ms."
+    ],
+    "donts": [
+      "**Don't** use LED amber for buttons, links, or selection, and don't use orange for times or scores.",
+      "**Don't** give each match its own floating card or add shadows to boards, tiles, or the scoreboard.",
+      "**Don't** introduce a second typeface or set times in a monospace face to imitate the LED.",
+      "**Don't** change the LED colours between themes; only the ground, surfaces, text, and orange adapt.",
+      "**Don't** use a state colour without its paired tint, or reuse home green or danger red for decoration."
+    ]
+  }
+}

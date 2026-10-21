@@ -23,3 +23,9 @@ cloudflare/.wrangler/
 cloudflare/worker-configuration.d.ts
 .dev.vars
 .dev.vars.*
+
+.impeccable/review/
+.impeccable/questions/
+.impeccable/hook.cache.json
+.impeccable/build/
+.impeccable/mocks/

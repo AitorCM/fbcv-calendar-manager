@@ -1,9 +1,9 @@
-import type { Calendar } from "./App";
+import type { Calendar } from "./api";
 
 const categories = ["senior", "junior", "cadete", "infantil", "alevin", "benjamin"];
 const normalize = (value: string) =>
   value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-const categoryOrder = (value: string) => {
+export const categoryOrder = (value: string) => {
   const name = normalize(value);
   const index = categories.findIndex((category) => name.includes(category));
   if (index >= 0) return index;
@@ -31,3 +31,7 @@ export function upcomingMatches(calendars: Calendar[], now = Date.now()) {
     a.team.name.localeCompare(b.team.name, "es"),
   );
 }
+
+export const categoryLabels = [
+  "Sénior", "Júnior", "Cadete", "Infantil", "Alevín", "Benjamín", "Otras categorías",
+];

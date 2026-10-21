@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
+import SevenSeg from "./SevenSeg";
+import { Icon } from "./Icon";
+import { ErrorPanel, SkeletonRows } from "./states";
 
 type Game = {
   id: string;
@@ -48,7 +51,15 @@ const today = () =>
     day: "2-digit",
   }).format(new Date());
 
-function ReviewCard({
+const groupFormat = new Intl.DateTimeFormat("es-ES", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  timeZone: "Europe/Madrid",
+});
+const PAGE_SIZE = 40;
+
+function ConflictRow({
   item,
   busy,
   onSave,
@@ -58,91 +69,146 @@ function ReviewCard({
   onSave: (item: Conflict, resolved: boolean, note: string) => void;
 }) {
   const [note, setNote] = useState(item.note);
+  const [editing, setEditing] = useState(false);
   useEffect(() => setNote(item.note), [item.note]);
+  const showNote = editing || note !== item.note;
   return (
-    <article className={`conflict-card ${item.resolved ? "reviewed" : ""}`}>
-      <div className="conflict-heading">
-        <div>
-          <span className={`conflict-badge ${item.kind}`}>
-            {item.kind === "simultaneous"
-              ? "Misma hora"
-              : `${item.gap_minutes} min entre partidos`}
-          </span>
-          <h3>{dateFormat.format(new Date(`${item.date}T12:00:00+01:00`))}</h3>
-          <p>
-            {item.venue} · {item.town}
-          </p>
-        </div>
-        <span className={`review-status ${item.resolved ? "done" : ""}`}>
-          {item.resolved ? "Resuelta" : "Pendiente"}
-        </span>
-      </div>
-      <div className="conflict-games">
+    <li className={`conflict-row${item.resolved ? " is-resolved" : ""}`}>
+      <ul className="conflict-games">
         {item.matches.map((m) => (
-          <div className="conflict-game" key={m.id}>
-            <time dateTime={m.starts_at}>
-              {timeFormat.format(new Date(m.starts_at))}
-            </time>
-            <div>
-              <strong>{m.home_team}</strong>
-              <span>vs {m.away_team}</span>
+          <li key={m.id}>
+            <div className="time-tile tile-sm">
+              <SevenSeg
+                value={timeFormat.format(new Date(m.starts_at))}
+                label={timeFormat.format(new Date(m.starts_at))}
+                size="sm"
+              />
+            </div>
+            <div className="conflict-game-main">
+              <strong>
+                {m.home_team} <span>–</span> {m.away_team}
+              </strong>
               <small>
                 {m.category} · Jornada {m.round}
               </small>
             </div>
             <a
+              className="icon-button ghost"
               href={m.source_url}
               target="_blank"
               rel="noreferrer"
               aria-label={`Consultar partido ${m.id} en FBCV`}
+              title="Ver en FBCV"
             >
-              FBCV ↗
+              <Icon name="external" />
             </a>
-          </div>
+          </li>
         ))}
-      </div>
-      <div className="review-actions">
-        <label htmlFor={`note-${item.id}`}>
-          Nota de revisión <span>(opcional)</span>
-        </label>
-        <textarea
-          id={`note-${item.id}`}
-          rows={2}
-          maxLength={1000}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Por ejemplo: se juega en dos pistas diferentes."
-        />
-        <div className="review-buttons">
-          <small>
-            {item.reviewed_at
-              ? `Última revisión: ${dateFormat.format(new Date(item.reviewed_at))}`
-              : "Separación mínima: 2 horas entre inicios."}
-          </small>
-          {note !== item.note && (
+      </ul>
+      <div className="conflict-side">
+        <span className={`conflict-kind${item.kind === "simultaneous" ? " is-strong" : ""}`}>
+          <Icon name="clock" />
+          {item.kind === "simultaneous"
+            ? "Misma hora"
+            : `${item.gap_minutes} min entre inicios`}
+        </span>
+        {item.resolved && (
+          <span className="conflict-state">
+            <Icon name="check" />
+            Resuelta
+            {item.reviewed_at && (
+              <small> el {dateFormat.format(new Date(item.reviewed_at))}</small>
+            )}
+          </span>
+        )}
+        {item.note && !showNote && (
+          <button className="conflict-note" onClick={() => setEditing(true)}>
+            <Icon name="note" />
+            <span>{item.note}</span>
+          </button>
+        )}
+        <div className="conflict-actions">
+          {!item.note && !showNote && (
             <button
-              disabled={busy}
-              className="secondary-action"
-              onClick={() => onSave(item, item.resolved, note)}
+              className="icon-button raised"
+              aria-label="Añadir nota"
+              title="Añadir nota"
+              onClick={() => setEditing(true)}
             >
-              Guardar nota
+              <Icon name="note" />
             </button>
           )}
           <button
             disabled={busy}
-            className={item.resolved ? "secondary-action" : "primary-action"}
+            className={`resolve-button${item.resolved ? " is-on" : ""}`}
+            aria-pressed={item.resolved}
             onClick={() => onSave(item, !item.resolved, note)}
           >
-            {busy
-              ? "Guardando…"
-              : item.resolved
-                ? "Reabrir incidencia"
-                : "Marcar como resuelta"}
+            <Icon name={item.resolved ? "refresh" : "check"} />
+            {busy ? "Guardando…" : item.resolved ? "Reabrir" : "Resolver"}
           </button>
         </div>
       </div>
-    </article>
+      {showNote && (
+        <div className="review-form">
+          <label htmlFor={`note-${item.id}`}>
+            Nota de revisión <span>(opcional)</span>
+          </label>
+          <textarea
+            id={`note-${item.id}`}
+            rows={2}
+            maxLength={1000}
+            value={note}
+            autoFocus
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Por ejemplo: se juega en dos pistas diferentes."
+          />
+          <div className="review-buttons">
+            <button
+              className="button secondary"
+              disabled={busy}
+              onClick={() => {
+                setNote(item.note);
+                setEditing(false);
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              disabled={busy || note === item.note}
+              className="button secondary"
+              onClick={() => {
+                onSave(item, item.resolved, note);
+                setEditing(false);
+              }}
+            >
+              Guardar nota
+            </button>
+          </div>
+        </div>
+      )}
+    </li>
   );
+}
+
+function groupBySlot(items: Conflict[]) {
+  const groups = new Map<
+    string,
+    { key: string; date: string; venue: string; town: string; items: Conflict[] }
+  >();
+  for (const item of items) {
+    const key = `${item.date}|${item.field_id}`;
+    if (!groups.has(key))
+      groups.set(key, {
+        key,
+        date: item.date,
+        venue: item.venue,
+        town: item.town,
+        items: [],
+      });
+    groups.get(key)!.items.push(item);
+  }
+  return [...groups.values()];
 }
 
 export default function ConflictsPanel({
@@ -167,6 +233,7 @@ export default function ConflictsPanel({
   const [from, setFrom] = useState(today);
   const [until, setUntil] = useState("");
   const [page, setPage] = useState(1);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   useEffect(() => {
     const ctrl = new AbortController();
     setLoading(true);
@@ -192,6 +259,11 @@ export default function ConflictsPanel({
     return () => ctrl.abort();
   }, [clubId, retry]);
   useEffect(() => setPage(1), [status, kind, team, venue, from, until]);
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(""), 4000);
+    return () => clearTimeout(t);
+  }, [notice]);
   const venues = useMemo(
     () =>
       Array.from(
@@ -214,7 +286,7 @@ export default function ConflictsPanel({
         (!from || c.date >= from) &&
         (!until || c.date <= until),
     ) || [];
-  const pages = Math.max(1, Math.ceil(filtered.length / 15));
+  const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const current = Math.min(page, pages);
   const pending = data?.items.filter((c) => !c.resolved).length || 0;
   async function save(item: Conflict, resolved: boolean, note: string) {
@@ -260,186 +332,248 @@ export default function ConflictsPanel({
       setSaving(null);
     }
   }
+  const extraFilters = [
+    kind !== "all",
+    team !== "all",
+    venue !== "all",
+    from !== today(),
+    !!until,
+  ].filter(Boolean).length;
+  const filtersActive =
+    status !== "pending" || kind !== "all" || team !== "all" || venue !== "all" || from !== today() || !!until;
   return (
-    <div className="conflicts-panel">
-      <div className="panel-toolbar">
-        <span className="section-label">REVISIÓN DE CALENDARIOS</span>
-        <button
-          className="text-action"
-          disabled={loading || !!saving}
-          onClick={() => setRetry((r) => r + 1)}
-        >
-          Actualizar lista
-        </button>
-      </div>
-      <div className="conflicts-intro">
-        <p className="eyebrow">{clubName}</p>
-        <h2>Incompatibilidades</h2>
-        <p>
-          Revisa coincidencias entre equipos de tu club y guarda las que ya has
-          comprobado.
-        </p>
-        <div className="review-explainer">
-          <strong>Posibles conflictos de instalación</strong>
-          <p>
-            FBCV no distingue todas las pistas interiores. Dos partidos pueden
-            compartir instalación y jugar en canchas diferentes. Marcarlos como
-            resueltos guarda tu revisión; no cambia sus horarios.
+    <div className="view conflicts">
+      <div className="toolbar">
+        <div>
+          <h2 className="view-title">Incompatibilidades</h2>
+          <p className="view-meta">
+            Partidos de {clubName} en la misma instalación a la misma hora o
+            con menos de {Math.round((data?.minimum_minutes ?? 120) / 60)} horas
+            entre inicios.
           </p>
         </div>
-      </div>
-      {loading && (
-        <p className="loading" role="status">
-          Buscando coincidencias…
-        </p>
-      )}
-      {error && (
-        <div className="error" role="alert">
-          <p>{error}</p>
-          <button onClick={() => setRetry((r) => r + 1)}>
-            Volver a cargar
+        <div className="toolbar-controls">
+          <button
+            className="button secondary"
+            disabled={loading || !!saving}
+            onClick={() => setRetry((r) => r + 1)}
+          >
+            <Icon name="refresh" />
+            Actualizar
           </button>
         </div>
+      </div>
+      <p className="explainer">
+        <Icon name="alert" />
+        <span>
+          La FBCV no distingue las pistas de una misma instalación: dos partidos
+          pueden coincidir y jugarse en canchas distintas. Marcar una
+          incidencia como resuelta guarda tu revisión para todo el club; no
+          cambia ningún horario.
+        </span>
+      </p>
+      {error && (
+        <ErrorPanel
+          message={error}
+          onRetry={() => setRetry((r) => r + 1)}
+          action="Volver a cargar"
+        />
       )}
       {notice && (
-        <p className="review-notice" role="status">
+        <p className="toast" role="status">
+          <Icon name="check" />
           {notice}
         </p>
       )}
+      {loading && <SkeletonRows count={4} />}
       {data && !loading && (
         <>
-          <div className="review-summary">
-            <span>
-              <b>{pending}</b> pendientes
-            </span>
-            <span>
-              <b>{data.items.length - pending}</b> resueltas
-            </span>
-            <small>
-              Temporada completa · cada incidencia compara dos partidos
-            </small>
-          </div>
-          <div className="conflict-filters">
-            <label>
-              Estado
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <option value="pending">Pendientes</option>
-                <option value="resolved">Resueltas</option>
-                <option value="all">Todas</option>
-              </select>
-            </label>
-            <label>
-              Tipo
-              <select value={kind} onChange={(e) => setKind(e.target.value)}>
-                <option value="all">Todos los tipos</option>
-                <option value="simultaneous">Misma hora</option>
-                <option value="short_gap">Menos de 2 horas</option>
-              </select>
-            </label>
-            <label>
-              Equipo
-              <select value={team} onChange={(e) => setTeam(e.target.value)}>
-                <option value="all">Todos los equipos</option>
-                {teams.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name} · {t.categories}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Instalación
-              <select value={venue} onChange={(e) => setVenue(e.target.value)}>
-                <option value="all">Todas las instalaciones</option>
-                {venues.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Desde
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            </label>
-            <label>
-              Hasta
-              <input
-                type="date"
-                value={until}
-                onChange={(e) => setUntil(e.target.value)}
-              />
-            </label>
+          <div className="filter-bar">
+            <div className="segmented" role="group" aria-label="Estado">
+              {(
+                [
+                  ["pending", `Pendientes · ${pending}`],
+                  ["resolved", `Resueltas · ${data.items.length - pending}`],
+                  ["all", `Todas · ${data.items.length}`],
+                ] as const
+              ).map(([value, text]) => (
+                <button
+                  key={value}
+                  aria-pressed={status === value}
+                  onClick={() => setStatus(value)}
+                >
+                  {text}
+                </button>
+              ))}
+            </div>
+            <button
+              className="button secondary filters-toggle"
+              aria-expanded={filtersOpen}
+              aria-controls="conflict-filters"
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              Filtros
+              {extraFilters > 0 && <span className="count-badge">{extraFilters}</span>}
+              <Icon name="chevron-down" />
+            </button>
+            <div
+              id="conflict-filters"
+              className={`filter-fields${filtersOpen ? " is-open" : ""}`}
+            >
+              <label>
+                <span>Tipo</span>
+                <select value={kind} onChange={(e) => setKind(e.target.value)}>
+                  <option value="all">Todos</option>
+                  <option value="simultaneous">Misma hora</option>
+                  <option value="short_gap">Menos de 2 horas</option>
+                </select>
+              </label>
+              <label>
+                <span>Equipo</span>
+                <select value={team} onChange={(e) => setTeam(e.target.value)}>
+                  <option value="all">Todos los equipos</option>
+                  {teams.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name} · {t.categories}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Instalación</span>
+                <select value={venue} onChange={(e) => setVenue(e.target.value)}>
+                  <option value="all">Todas</option>
+                  {venues.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>Desde</span>
+                <input
+                  type="date"
+                  value={from}
+                  onChange={(e) => setFrom(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Hasta</span>
+                <input
+                  type="date"
+                  value={until}
+                  onChange={(e) => setUntil(e.target.value)}
+                />
+              </label>
+            </div>
           </div>
           <div className="results-line">
-            <p>{filtered.length} incidencias con estos filtros</p>
-            <button
-              className="text-action"
-              onClick={() => {
-                setStatus("all");
-                setKind("all");
-                setTeam("all");
-                setVenue("all");
-                setFrom("");
-                setUntil("");
-              }}
-            >
-              Ver toda la temporada
-            </button>
-          </div>
-          {data.skipped_matches > 0 && (
-            <p className="excluded-note">
-              {data.skipped_matches} partidos no se han comparado por falta de
-              instalación o de fecha/hora confirmada.
+            <p>
+              <b>{filtered.length}</b>{" "}
+              {filtered.length === 1 ? "incidencia" : "incidencias"}
+              {data.skipped_matches > 0 && (
+                <span>
+                  {" "}
+                  · {data.skipped_matches}{" "}
+                  {data.skipped_matches === 1
+                    ? "partido sin instalación u hora confirmada no se compara"
+                    : "partidos sin instalación u hora confirmada no se comparan"}
+                </span>
+              )}
             </p>
-          )}
+            {filtersActive && (
+              <button
+                className="text-button"
+                onClick={() => {
+                  setStatus("pending");
+                  setKind("all");
+                  setTeam("all");
+                  setVenue("all");
+                  setFrom(today());
+                  setUntil("");
+                }}
+              >
+                Quitar filtros
+              </button>
+            )}
+          </div>
           {from && until && from > until ? (
-            <p className="review-empty">
+            <p className="empty-note boxed">
               La fecha «Hasta» debe ser igual o posterior a «Desde».
             </p>
           ) : filtered.length === 0 ? (
-            <p className="review-empty">
-              No hay incidencias con estos filtros. Puedes consultar las
-              resueltas o ampliar las fechas.
-            </p>
+            <div className="empty-panel">
+              <Icon name="check" />
+              <h3>
+                {status === "pending" && pending === 0
+                  ? "Todo revisado"
+                  : "Sin incidencias con estos filtros"}
+              </h3>
+              <p>
+                {status === "pending" && pending === 0
+                  ? "No queda ninguna incompatibilidad pendiente en el club."
+                  : "Prueba a consultar las resueltas o a ampliar las fechas."}
+              </p>
+              {status !== "all" && (
+                <button
+                  className="button secondary"
+                  onClick={() => {
+                    setStatus("all");
+                    setFrom("");
+                  }}
+                >
+                  Ver toda la temporada
+                </button>
+              )}
+            </div>
           ) : (
             <div className="conflict-list">
-              {filtered.slice((current - 1) * 15, current * 15).map((item) => (
-                <ReviewCard
-                  key={item.id}
-                  item={item}
-                  busy={saving === item.id}
-                  onSave={save}
-                />
+              {groupBySlot(
+                filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE),
+              ).map((g) => (
+                <section className="board-section" key={g.key}>
+                  <h3 className="board-heading">
+                    <span>{groupFormat.format(new Date(`${g.date}T12:00:00+01:00`))}</span>
+                    <span className="heading-venue">
+                      {g.venue} · {g.town}
+                    </span>
+                    <span className="board-count">{g.items.length}</span>
+                  </h3>
+                  <ul className="board conflict-board">
+                    {g.items.map((item) => (
+                      <ConflictRow
+                        key={item.id}
+                        item={item}
+                        busy={saving === item.id}
+                        onSave={save}
+                      />
+                    ))}
+                  </ul>
+                </section>
               ))}
             </div>
           )}
           {pages > 1 && (
-            <nav
-              className="review-pagination"
-              aria-label="Páginas de incidencias"
-            >
+            <nav className="pagination" aria-label="Páginas de incidencias">
               <button
+                className="button secondary"
                 disabled={current === 1}
                 onClick={() => setPage(current - 1)}
               >
+                <Icon name="chevron-left" />
                 Anterior
               </button>
               <span>
                 Página {current} de {pages}
               </span>
               <button
+                className="button secondary"
                 disabled={current === pages}
                 onClick={() => setPage(current + 1)}
               >
                 Siguiente
+                <Icon name="chevron-right" />
               </button>
             </nav>
           )}

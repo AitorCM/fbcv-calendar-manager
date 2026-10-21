@@ -1,284 +1,118 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
 import ConflictsPanel from "./ConflictsPanel";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { upcomingMatches } from "./upcoming";
+import ClubSearch from "./ClubSearch";
+import UpcomingView from "./UpcomingView";
+import TeamsView from "./TeamsView";
+import SevenSeg from "./SevenSeg";
+import { BrandMark, Icon } from "./Icon";
+import { ErrorPanel } from "./states";
+import {
+  FBCV_URL,
+  get,
+  initials,
+  type Calendar,
+  type Club,
+  type Meta,
+  type Team,
+} from "./api";
 
-type Club = { id: string; name: string; team_count: number };
-type Team = {
-  id: string;
-  name: string;
-  match_count: number;
-  group_count: number;
-  categories: string;
-};
-type Match = {
-  id: string;
-  home: boolean;
-  home_team: string;
-  away_team: string;
-  starts_at: string | null;
-  time_confirmed: boolean;
-  venue: string | null;
-  town: string | null;
-  address: string | null;
-  home_score: string | null;
-  away_score: string | null;
-  message: string | null;
-  source_url: string;
-};
-type Round = {
-  number: string;
-  nominal_date: string | null;
-  rest: boolean;
-  matches: Match[];
-};
-type Group = {
-  id: string;
-  name: string;
-  category: string;
-  phase: string;
-  rounds: Round[];
-};
-export type Calendar = { team: Team; groups: Group[] };
-type Meta = { season_label: string; updated_at: string | null; status: string };
-const fold = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-const day = (s: string) =>
-  new Intl.DateTimeFormat("es-ES", {
-    day: "numeric",
-    month: "short",
-    timeZone: "Europe/Madrid",
-  }).format(new Date(s.length === 10 ? `${s}T12:00:00+02:00` : s));
-const clock = (s: string) =>
-  new Intl.DateTimeFormat("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Madrid",
-  }).format(new Date(s));
-async function get<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const r = await fetch(url, { signal });
-  if (!r.ok)
-    throw new Error(
-      "No se han podido cargar los datos. Comprueba que la app está en marcha y vuelve a intentarlo.",
-    );
-  return r.json();
-}
-function Ball() {
-  return (
-    <svg viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="17" />
-      <path d="M3 20h34M20 3v34M8 8c16 3 20 15 24 24M32 8C16 11 12 23 8 32" />
-    </svg>
-  );
-}
-function Arrow() {
-  return (
-    <svg viewBox="0 0 20 20" aria-hidden="true">
-      <path d="m7 4 6 6-6 6" />
-    </svg>
-  );
-}
-function ClubPicker({
-  clubs,
-  selected,
-  onSelect,
-}: {
-  clubs: Club[];
-  selected: Club | null;
-  onSelect: (c: Club) => void;
-}) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const input = useRef<HTMLInputElement>(null);
-  const results = useMemo(
-    () => clubs.filter((c) => fold(c.name).includes(fold(query))),
-    [clubs, query],
-  );
-  useEffect(() => {
-    function outside(e: PointerEvent) {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+export type { Calendar } from "./api";
+
+type View = "proximos" | "equipos" | "incompatibilidades";
+type Route = { club?: string; view: View; team?: string };
+const VIEWS: { id: View; label: string }[] = [
+  { id: "proximos", label: "Próximos" },
+  { id: "equipos", label: "Equipos" },
+  { id: "incompatibilidades", label: "Incompatibilidades" },
+];
+
+const store = {
+  read(key: string) {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
     }
-    document.addEventListener("pointerdown", outside);
-    return () => document.removeEventListener("pointerdown", outside);
-  }, []);
-  useEffect(() => {
-    ref.current
-      ?.querySelector(`#club-option-${active}`)
-      ?.scrollIntoView({ block: "nearest" });
-  }, [active]);
-  function choose(c: Club) {
-    onSelect(c);
-    setQuery("");
-    setOpen(false);
-    input.current?.focus();
+  },
+  write(key: string, value: string | null) {
+    try {
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
+    } catch {
+      /* Preferences are a convenience; the app works without storage. */
+    }
+  },
+};
+
+function readRoute(): Route {
+  const p = new URLSearchParams(location.search);
+  const view = VIEWS.some((v) => v.id === p.get("vista"))
+    ? (p.get("vista") as View)
+    : "proximos";
+  return {
+    club: p.get("club") || undefined,
+    view,
+    team: (view === "equipos" && p.get("equipo")) || undefined,
+  };
+}
+
+function routeUrl(r: Route) {
+  const p = new URLSearchParams();
+  if (r.club) p.set("club", r.club);
+  if (r.club && r.view !== "proximos") p.set("vista", r.view);
+  if (r.club && r.view === "equipos" && r.team) p.set("equipo", r.team);
+  const q = p.toString();
+  return q ? `/?${q}` : "/";
+}
+
+function readFavorites(): Record<string, string[]> {
+  try {
+    const value = JSON.parse(store.read("fbcv-favorites") || "{}");
+    return value && typeof value === "object" ? value : {};
+  } catch {
+    return {};
   }
-  return (
-    <div className="picker" ref={ref}>
-      <label htmlFor="club-search">Tu club</label>
-      <div className={`search-box ${open ? "is-open" : ""}`}>
-        <svg viewBox="0 0 20 20" aria-hidden="true">
-          <circle cx="8" cy="8" r="5" />
-          <path d="m12 12 5 5" />
-        </svg>
-        <input
-          ref={input}
-          id="club-search"
-          role="combobox"
-          aria-expanded={open}
-          aria-controls="club-options"
-          aria-autocomplete="list"
-          aria-activedescendant={
-            open && results.length ? `club-option-${active}` : undefined
-          }
-          autoComplete="off"
-          placeholder={selected ? selected.name : "Busca o elige tu club…"}
-          value={query}
-          onFocus={() => setOpen(true)}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setActive(0);
-            setOpen(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setOpen(false);
-              return;
-            }
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-              e.preventDefault();
-              setOpen(true);
-              setActive((a) =>
-                Math.max(
-                  0,
-                  Math.min(
-                    results.length - 1,
-                    a + (e.key === "ArrowDown" ? 1 : -1),
-                  ),
-                ),
-              );
-            }
-            if (e.key === "Enter" && open && results[active]) {
-              e.preventDefault();
-              choose(results[active]);
-            }
-          }}
-        />
-        <button
-          className="dropdown-toggle"
-          aria-label={open ? "Cerrar clubes" : "Mostrar clubes"}
-          onClick={() => {
-            setOpen(!open);
-            if (!open) input.current?.focus();
-          }}
-        >
-          <span aria-hidden="true">⌄</span>
-        </button>
-      </div>
-      {open && (
-        <div className="club-menu">
-          <div className="menu-label">{results.length} clubes disponibles</div>
-          <ul id="club-options" role="listbox" aria-label="Clubes">
-            {results.map((c, i) => (
-              <li
-                key={c.id}
-                id={`club-option-${i}`}
-                role="option"
-                aria-selected={selected?.id === c.id}
-                className={active === i ? "highlighted" : ""}
-                onPointerMove={() => setActive(i)}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => choose(c)}
-              >
-                <span>{c.name}</span>
-                <small>{c.team_count} equipos</small>
-              </li>
-            ))}
-          </ul>
-          {!results.length && (
-            <p className="no-results">
-              No hay clubes con ese nombre. Prueba con menos letras.
-            </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
 }
-function MatchCard({ match: m, team }: { match: Match; team: string }) {
-  const played = m.home_score !== null && m.away_score !== null;
-  return (
-    <div className="match">
-      <div className="match-top">
-        <span className={`location ${m.home ? "home" : "away"}`}>
-          {m.home ? "En casa" : "Visitante"}
-        </span>
-        <span className="match-date">
-          {m.starts_at ? day(m.starts_at) : "Fecha pendiente"}
-          <b>
-            {m.starts_at && m.time_confirmed
-              ? clock(m.starts_at)
-              : "Hora por confirmar"}
-          </b>
-        </span>
-      </div>
-      <div className="opponents">
-        <div className={m.home ? "own-team" : ""}>
-          {m.home_team}
-          <span>{played ? m.home_score : ""}</span>
-        </div>
-        <div className={!m.home ? "own-team" : ""}>
-          {m.away_team}
-          <span>{played ? m.away_score : ""}</span>
-        </div>
-        {!played && <span className="versus">vs</span>}
-      </div>
-      <div className="match-bottom">
-        <span>
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path d="M10 18s6-6 6-10a6 6 0 1 0-12 0c0 4 6 10 6 10Z" />
-            <circle cx="10" cy="8" r="2" />
-          </svg>
-          {m.venue || "Pabellón por confirmar"}
-          {m.town && <small>{m.town}</small>}
-        </span>
-        <a
-          href={m.source_url}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={`Ver partido de ${team} en la web de FBCV`}
-        >
-          FBCV ↗
-        </a>
-      </div>
-      {m.message && <p className="match-note">{m.message}</p>}
-    </div>
-  );
-}
+
 export default function App() {
-  const [view, setView] = useState("upcoming");
+  const [route, setRoute] = useState<Route>(() => {
+    const r = readRoute();
+    return r.club ? r : { ...r, club: store.read("fbcv-club") || undefined };
+  });
   const [clubs, setClubs] = useState<Club[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [club, setClub] = useState<Club | null>(null);
+  const [clubsError, setClubsError] = useState("");
+  const [clubsLoading, setClubsLoading] = useState(true);
+  const [clubsRetry, setClubsRetry] = useState(0);
   const [teams, setTeams] = useState<Team[]>([]);
-  const [team, setTeam] = useState<Team | null>(null);
-  const [calendar, setCalendar] = useState<Calendar | null>(null);
-  const [clubCalendars, setClubCalendars] = useState<Calendar[]>([]);
-  const [upcomingLoading, setUpcomingLoading] = useState(false);
-  const [upcomingError, setUpcomingError] = useState("");
-  const [upcomingRetry, setUpcomingRetry] = useState(0);
-  const [groupId, setGroupId] = useState("");
-  const [loading, setLoading] = useState("clubs");
-  const [error, setError] = useState("");
-  const [retry, setRetry] = useState(0);
+  const [calendars, setCalendars] = useState<Calendar[]>([]);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState("");
+  const [dataRetry, setDataRetry] = useState(0);
+  const [favorites, setFavorites] = useState(readFavorites);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const switcher = useRef<HTMLDivElement>(null);
+  const club = clubs.find((c) => c.id === route.club) ?? null;
+
+  const navigate = useCallback((next: Route, replace = false) => {
+    setRoute(next);
+    const url = routeUrl(next);
+    if (url !== location.pathname + location.search)
+      history[replace ? "replaceState" : "pushState"](null, "", url);
+    if (!replace) window.scrollTo({ top: 0 });
+  }, []);
+
+  useEffect(() => {
+    const onPop = () => setRoute(readRoute());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   useEffect(() => {
     const c = new AbortController();
-    setError("");
-    setLoading("clubs");
+    setClubsError("");
+    setClubsLoading(true);
     Promise.all([
       get<Club[]>("/api/clubs", c.signal),
       get<Meta>("/api/meta", c.signal),
@@ -286,489 +120,275 @@ export default function App() {
       .then(([cs, m]) => {
         setClubs(cs);
         setMeta(m);
-        setLoading("");
+        setClubsLoading(false);
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
-          setError(e.message);
-          setLoading("");
+          setClubsError(e.message);
+          setClubsLoading(false);
         }
       });
     return () => c.abort();
-  }, [retry]);
+  }, [clubsRetry]);
+
+  // Keep the address bar in step with the remembered club, and forget a
+  // club that no longer exists this season.
+  useEffect(() => {
+    if (clubsLoading || clubsError) return;
+    if (route.club && !club) {
+      store.write("fbcv-club", null);
+      navigate({ view: "proximos" }, true);
+    } else if (club) {
+      store.write("fbcv-club", club.id);
+      navigate(route, true);
+    }
+  }, [clubsLoading, clubsError, club, route, navigate]);
+
   useEffect(() => {
     if (!club) return;
     const c = new AbortController();
-    setError("");
-    setLoading("teams");
+    setDataError("");
+    setDataLoading(true);
+    setTeams([]);
+    setCalendars([]);
     get<Team[]>(`/api/clubs/${club.id}/teams`, c.signal)
-      .then((t) => {
-        setTeams(t);
-        setLoading("");
-      })
-      .catch((e) => {
-        if (e.name !== "AbortError") {
-          setError(e.message);
-          setLoading("");
-        }
-      });
-    return () => c.abort();
-  }, [club, retry]);
-  useEffect(() => {
-    if (!club || !teams.length) return;
-    const c = new AbortController();
-    setUpcomingLoading(true);
-    setUpcomingError("");
-    Promise.all(
-      teams.map((t) =>
-        get<Calendar>(`/api/clubs/${club.id}/teams/${t.id}/calendar`, c.signal),
-      ),
-    )
-      .then((data) => {
-        setClubCalendars(data);
-        setUpcomingLoading(false);
-      })
-      .catch((e) => {
-        if (e.name !== "AbortError") {
-          setUpcomingError(e.message);
-          setUpcomingLoading(false);
-        }
-      });
-    return () => c.abort();
-  }, [club, teams, upcomingRetry]);
-  useEffect(() => {
-    if (!club || !team) return;
-    const c = new AbortController();
-    setError("");
-    setLoading("calendar");
-    get<Calendar>(`/api/clubs/${club.id}/teams/${team.id}/calendar`, c.signal)
-      .then((data) => {
-        setCalendar(data);
-        const upcoming = data.groups.find((g) =>
-          g.rounds.some((r) =>
-            r.matches.some(
-              (m) => m.starts_at && new Date(m.starts_at) > new Date(),
+      .then((ts) => {
+        setTeams(ts);
+        return Promise.all(
+          ts.map((t) =>
+            get<Calendar>(
+              `/api/clubs/${club.id}/teams/${t.id}/calendar`,
+              c.signal,
             ),
           ),
         );
-        setGroupId((upcoming || data.groups.at(-1))?.id || "");
-        setLoading("");
+      })
+      .then((data) => {
+        setCalendars(data);
+        setDataLoading(false);
       })
       .catch((e) => {
         if (e.name !== "AbortError") {
-          setError(e.message);
-          setLoading("");
+          setDataError(e.message);
+          setDataLoading(false);
         }
       });
     return () => c.abort();
-  }, [team, club, retry]);
+  }, [club, dataRetry]);
+
+  useEffect(() => {
+    if (!switcherOpen) return;
+    const outside = (e: PointerEvent) => {
+      if (!switcher.current?.contains(e.target as Node)) setSwitcherOpen(false);
+    };
+    const escape = (e: KeyboardEvent) => e.key === "Escape" && setSwitcherOpen(false);
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [switcherOpen]);
+
+  useEffect(() => {
+    document.title = club ? `${club.name} · En pista` : "En pista · Calendarios FBCV";
+  }, [club]);
+
   function selectClub(c: Club) {
-    if (club?.id === c.id) return;
-    setClub(c);
-    setView("upcoming");
-    setClubCalendars([]);
-    setUpcomingError("");
-    setUpcomingLoading(false);
-    setTeams([]);
-    setTeam(null);
-    setCalendar(null);
+    setSwitcherOpen(false);
+    navigate({ club: c.id, view: route.club === c.id ? route.view : "proximos" });
   }
-  function selectTeam(t: Team) {
-    setView("calendar");
-    if (team?.id === t.id) return;
-    setTeam(t);
-    setCalendar(null);
+
+  const clubFavorites = (club && favorites[club.id]) || [];
+  function toggleFavorite(teamId: string) {
+    if (!club) return;
+    const list = clubFavorites.includes(teamId)
+      ? clubFavorites.filter((id) => id !== teamId)
+      : [...clubFavorites, teamId];
+    const next = { ...favorites, [club.id]: list };
+    setFavorites(next);
+    store.write("fbcv-favorites", JSON.stringify(next));
   }
-  const group = calendar?.groups.find((g) => g.id === groupId);
-  const next = group?.rounds
-    .flatMap((r) => r.matches)
-    .filter((m) => m.starts_at && new Date(m.starts_at) > new Date())
-    .sort((a, b) => a.starts_at!.localeCompare(b.starts_at!))[0];
+
+  const updated = meta?.updated_at
+    ? new Intl.DateTimeFormat("es-ES", {
+        day: "numeric",
+        month: "long",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Europe/Madrid",
+      }).format(new Date(meta.updated_at))
+    : null;
+  const season = meta?.season_label || "2026–2027";
+
   return (
-    <>
-      <header className="topbar">
-        <a className="brand" href="/" aria-label="En pista, inicio">
-          <Ball />
-          <span>
-            EN PISTA<small>CALENDARIOS FBCV</small>
+    <div className="app">
+      <a className="skip-link" href="#contenido">
+        Saltar al contenido
+      </a>
+      <header className="shell">
+        <div className="shell-inner">
+          <a
+            className="brand"
+            href={routeUrl({ club: club?.id, view: "proximos" })}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate({ club: club?.id, view: "proximos" });
+            }}
+          >
+            <BrandMark />
+            <span className="brand-name">En pista</span>
+          </a>
+          <span className="season" title={`Temporada ${season}`}>
+            <span className="season-label">Temporada</span>
+            <SevenSeg
+              value={season.replace(/^20(\d\d)\D20(\d\d)$/, "$1-$2")}
+              label={season}
+              size="sm"
+            />
           </span>
-        </a>
-        <div className="header-actions">
-          <div className="season">
-            <span className="status-dot" />
-            TEMPORADA {meta?.season_label || "2026–2027"}
-          </div>
-          <ThemeToggle />
-        </div>
-      </header>
-      <main>
-        <div className="intro">
-          <div>
-            <p className="eyebrow">TU CLUB. TUS EQUIPOS. CADA JORNADA.</p>
-            <h1>
-              Todo el juego,
-              <br className="mobile-break" /> en un solo lugar.
-            </h1>
-            <p>
-              Encuentra tu club y consulta cuándo y dónde juega cada equipo.
-            </p>
-          </div>
-          <div className="season-mark" aria-hidden="true">
-            26<span>/</span>27
-          </div>
-        </div>
-        <nav className="view-tabs" aria-label="Vistas del club">
-          <button
-            aria-pressed={view === "upcoming"}
-            onClick={() => setView("upcoming")}
-          >
-            Próximos partidos
-          </button>
-          <button
-            aria-pressed={view === "calendar"}
-            onClick={() => setView("calendar")}
-          >
-            Calendarios
-          </button>
-          <button
-            aria-pressed={view === "conflicts"}
-            onClick={() => setView("conflicts")}
-          >
-            Incompatibilidades
-          </button>
-        </nav>
-        <div className="workspace">
-          <aside className="sidebar">
-            <ClubPicker clubs={clubs} selected={club} onSelect={selectClub} />
-            {loading === "clubs" && (
-              <p className="loading" role="status">
-                Cargando clubes…
-              </p>
-            )}
+          <div className="shell-actions">
             {club && (
-              <>
-                <div className="club-heading">
-                  <div className="club-monogram">
-                    {club.name
-                      .split(" ")
-                      .filter((s) => s.length > 2)
-                      .slice(0, 2)
-                      .map((s) => s[0])
-                      .join("")}
+              <div className="switcher" ref={switcher}>
+                <button
+                  className="switcher-button"
+                  aria-expanded={switcherOpen}
+                  aria-haspopup="dialog"
+                  onClick={() => setSwitcherOpen(!switcherOpen)}
+                >
+                  <Icon name="swap" />
+                  <span>Cambiar de club</span>
+                </button>
+                {switcherOpen && (
+                  <div className="switcher-panel" role="dialog" aria-label="Cambiar de club">
+                    <ClubSearch
+                      clubs={clubs}
+                      selectedId={club.id}
+                      onSelect={selectClub}
+                      autoFocus
+                    />
                   </div>
-                  <div>
-                    <h2>{club.name}</h2>
-                    <p>{teams.length} equipos con calendario</p>
-                  </div>
-                </div>
-                {view !== "conflicts" && (
-                  <>
-                    <div className="section-label">
-                      ELIGE UN EQUIPO{" "}
-                      <span>{teams.length.toString().padStart(2, "0")}</span>
-                    </div>
-                    {loading === "teams" ? (
-                      <p role="status" className="loading">
-                        Buscando equipos…
-                      </p>
-                    ) : (
-                      <div className="team-list">
-                        {teams.map((t) => (
-                          <button
-                            key={t.id}
-                            className={`team-button ${team?.id === t.id ? "selected" : ""}`}
-                            aria-pressed={team?.id === t.id}
-                            onClick={() => selectTeam(t)}
-                          >
-                            <div>
-                              <span>{t.name}</span>
-                              <small>{t.categories?.split(",")[0]}</small>
-                              <em>
-                                {t.match_count} partidos · {t.group_count}{" "}
-                                {t.group_count === 1
-                                  ? "competición"
-                                  : "competiciones"}
-                              </em>
-                            </div>
-                            <Arrow />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </>
                 )}
-                {view === "conflicts" && (
-                  <p className="muted">
-                    Consulta las coincidencias de todos los equipos del club.
-                    Usa los filtros para centrar la revisión.
-                  </p>
-                )}
-                {!teams.length && loading !== "teams" && (
-                  <p className="muted">
-                    Este club no tiene equipos con calendario publicado.
-                  </p>
-                )}
-              </>
-            )}
-            {!club && (
-              <div className="sidebar-hint">
-                <span className="hint-line" />
-                <p>
-                  Empieza por tu club.
-                  <br />
-                  Después, elige el equipo
-                  <br />
-                  que quieres seguir.
-                </p>
               </div>
             )}
-          </aside>
-          <section
-            className="calendar-panel"
-            aria-label={
-              view === "upcoming"
-                ? "Próximos partidos del club"
-                : view === "calendar"
-                ? "Calendario del equipo"
-                : "Incompatibilidades del club"
-            }
-          >
-            {view === "upcoming" && (
-              <>
-                <div className="panel-toolbar">
-                  <span className="section-label">PRÓXIMOS PARTIDOS</span>
-                  <span className="subtle">De sénior a benjamín</span>
-                </div>
-                {(error || upcomingError) && (
-                  <div className="error" role="alert">
-                    <p>{error || upcomingError}</p>
-                    <button
-                      onClick={() =>
-                        error
-                          ? setRetry((r) => r + 1)
-                          : setUpcomingRetry((r) => r + 1)
-                      }
-                    >
-                      Volver a intentar
-                    </button>
-                  </div>
-                )}
-                {!club ? (
-                  <div className="empty-state">
-                    <h2>Busca tu club.</h2>
-                    <p>Consulta el próximo partido de cada equipo, de mayor a menor categoría.</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="team-title">
-                      <p className="eyebrow">{club.name}</p>
-                      <h2>El club, en pista.</h2>
-                      <p className="muted">Un próximo partido por equipo, entre todas sus competiciones.</p>
-                    </div>
-                    {(loading === "teams" || upcomingLoading) && (
-                      <div className="loading-calendar" role="status">
-                        <span className="spinner" />
-                        Cargando próximos partidos…
-                      </div>
-                    )}
-                    {!error && !upcomingError && loading !== "teams" && !upcomingLoading && (
-                      <div className="upcoming-list">
-                        {upcomingMatches(clubCalendars).map(({ team: t, match, category }) => (
-                          <section key={t.id} className="upcoming-team" aria-label={t.name}>
-                            <div className="upcoming-heading">
-                              <div>
-                                <p className="eyebrow">{category || t.categories}</p>
-                                <h3>{t.name}</h3>
-                              </div>
-                              <button className="team-button" onClick={() => selectTeam(t)}>
-                                Ver calendario <Arrow />
-                              </button>
-                            </div>
-                            {match ? <MatchCard match={match} team={t.name} /> : (
-                              <p className="muted">Sin próximo partido con fecha y hora publicadas.</p>
-                            )}
-                          </section>
-                        ))}
-                        {!teams.length && <p className="muted">Este club no tiene equipos con calendario publicado.</p>}
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-            {view === "conflicts" &&
-              (club ? (
-                <ConflictsPanel
-                  key={club.id}
-                  clubId={club.id}
-                  clubName={club.name}
-                  teams={teams}
-                />
-              ) : (
-                <div className="empty-state">
-                  <h2>Elige tu club.</h2>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      {club ? (
+        <>
+          <div className="club-bar">
+            <div className="club-bar-inner">
+              <div className="club-identity">
+                <span className="club-monogram" aria-hidden="true">
+                  {initials(club.name)}
+                </span>
+                <div>
+                  <h1>{club.name}</h1>
                   <p>
-                    Selecciona un club para revisar las posibles
-                    incompatibilidades de sus equipos.
+                    {club.team_count}{" "}
+                    {club.team_count === 1 ? "equipo" : "equipos"} ·{" "}
+                    <span className="nowrap">Temporada {season}</span>
                   </p>
                 </div>
-              ))}
-            {view === "calendar" && (
-              <>
-                <div className="panel-toolbar">
-                  <span className="section-label">
-                    {team ? "CALENDARIO DEL EQUIPO" : "TU CALENDARIO"}
-                  </span>
-                  <span className="subtle">Por jornadas</span>
-                </div>
-                {error && (
-                  <div className="error" role="alert">
-                    <p>{error}</p>
-                    <button onClick={() => setRetry((r) => r + 1)}>
-                      Volver a intentar
-                    </button>
-                  </div>
-                )}
-                {!team && !error && (
-                  <div className="empty-state">
-                    <div className="court" aria-hidden="true">
-                      <div className="court-mid" />
-                      <div className="court-circle" />
-                      <div className="court-key left" />
-                      <div className="court-key right" />
-                      <Ball />
-                    </div>
-                    <p className="eyebrow">EL SIGUIENTE PARTIDO EMPIEZA AQUÍ</p>
-                    <h2>{club ? "Elige tu equipo." : "Busca tu club."}</h2>
-                    <p>
-                      {club
-                        ? "Selecciona un equipo para ver sus partidos, jornadas y pabellones."
-                        : "Todos sus equipos y calendarios, preparados para que no te pierdas ninguna jornada."}
-                    </p>
-                    <div className="empty-chips">
-                      <span>Club</span>
-                      <i>→</i>
-                      <span>Equipo</span>
-                      <i>→</i>
-                      <span>Calendario</span>
-                    </div>
-                  </div>
-                )}
-                {team && (
-                  <>
-                    <div className="team-title">
-                      <p className="eyebrow">{club?.name}</p>
-                      <h2>{team.name}</h2>
-                    </div>
-                    {loading === "calendar" && (
-                      <div className="loading-calendar" role="status">
-                        <span className="spinner" />
-                        Cargando jornadas…
-                      </div>
-                    )}
-                    {calendar && group && (
-                      <>
-                        <div className="calendar-controls">
-                          <div>
-                            <label htmlFor="competition">
-                              Competición y fase
-                            </label>
-                            <select
-                              id="competition"
-                              value={groupId}
-                              onChange={(e) => setGroupId(e.target.value)}
-                            >
-                              {calendar.groups.map((g) => (
-                                <option key={g.id} value={g.id}>
-                                  {g.category} · {g.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <span className="round-count">
-                            {group.rounds.length} jornadas
-                          </span>
-                        </div>
-                        {next && (
-                          <div className="next-match">
-                            <span className="next-label">
-                              <span className="status-dot" />
-                              PRÓXIMO PARTIDO
-                            </span>
-                            <span>
-                              {day(next.starts_at!)}
-                              {next.time_confirmed
-                                ? ` · ${clock(next.starts_at!)}`
-                                : " · Hora por confirmar"}
-                            </span>
-                            <strong>
-                              {next.home ? next.away_team : next.home_team}
-                            </strong>
-                            <span className="next-location">
-                              {next.home ? "En casa" : "Visitante"}
-                            </span>
-                          </div>
-                        )}
-                        <div className="rounds">
-                          {group.rounds.map((r) => (
-                            <article className="round" key={r.number}>
-                              <div className="round-marker">
-                                <span>JORNADA</span>
-                                <b>{r.number.padStart(2, "0")}</b>
-                                {r.nominal_date && (
-                                  <small>{day(r.nominal_date)}</small>
-                                )}
-                              </div>
-                              <div className="round-content">
-                                {r.matches.map((m) => (
-                                  <MatchCard
-                                    key={m.id}
-                                    match={m}
-                                    team={team.name}
-                                  />
-                                ))}
-                                {r.rest && (
-                                  <div className="rest">
-                                    <span>—</span>
-                                    <div>
-                                      <strong>Jornada de descanso</strong>
-                                      <p>
-                                        Este equipo no juega en esta jornada.
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </article>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </>
-                )}
-              </>
+              </div>
+            </div>
+          </div>
+          <div className="tabs-bar">
+            <div className="tabs-inner">
+              <nav className="tabs" aria-label="Secciones del club">
+                {VIEWS.map((v) => (
+                  <a
+                    key={v.id}
+                    href={routeUrl({ club: club.id, view: v.id })}
+                    aria-current={route.view === v.id ? "page" : undefined}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate({ club: club.id, view: v.id });
+                    }}
+                  >
+                    {v.label}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </div>
+          <main id="contenido" className="content">
+            {route.view === "proximos" && (
+              <UpcomingView
+                calendars={calendars}
+                loading={dataLoading}
+                error={dataError}
+                onRetry={() => setDataRetry((r) => r + 1)}
+                favorites={clubFavorites}
+                onOpenTeam={(team) => navigate({ club: club.id, view: "equipos", team })}
+              />
             )}
-          </section>
-        </div>
-        <footer>
+            {route.view === "equipos" && (
+              <TeamsView
+                teams={teams}
+                calendars={calendars}
+                loading={dataLoading}
+                error={dataError}
+                onRetry={() => setDataRetry((r) => r + 1)}
+                teamId={route.team}
+                favorites={clubFavorites}
+                onSelectTeam={(team) => navigate({ club: club.id, view: "equipos", team })}
+                onToggleFavorite={toggleFavorite}
+              />
+            )}
+            {route.view === "incompatibilidades" && (
+              <ConflictsPanel
+                key={club.id}
+                clubId={club.id}
+                clubName={club.name}
+                teams={teams}
+              />
+            )}
+          </main>
+        </>
+      ) : (
+        <main id="contenido" className="welcome">
+          <div className="welcome-card">
+            <h1>¿De qué club eres?</h1>
+            <p className="welcome-lead">
+              Elige tu club y verás el próximo partido de cada equipo, sus
+              calendarios completos y los posibles choques de horario en la
+              misma pista.
+            </p>
+            {clubsError ? (
+              <ErrorPanel message={clubsError} onRetry={() => setClubsRetry((r) => r + 1)} />
+            ) : (
+              <ClubSearch
+                clubs={clubs}
+                onSelect={selectClub}
+                loading={clubsLoading || (!!route.club && !club)}
+                autoFocus={matchMedia("(min-width: 720px)").matches}
+              />
+            )}
+            <p className="welcome-note">
+              Recordaremos tu club en este dispositivo. Podrás cambiarlo cuando
+              quieras.
+            </p>
+          </div>
+        </main>
+      )}
+
+      <footer className="footer">
+        <div className="footer-inner">
           <span>
-            En pista · Calendarios de baloncesto de la Comunitat Valenciana
+            Datos publicados por la FBCV
+            {updated ? `, consultados el ${updated}` : ""}.
           </span>
           <span>
-            {meta?.updated_at
-              ? `Datos consultados el ${new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long", timeZone: "Europe/Madrid" }).format(new Date(meta.updated_at))}`
-              : "Datos de FBCV"}{" "}
-            ·{" "}
-            <a
-              href="https://www.fbcv.es/competiciones/calendario-resultados-y-clasificacion/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Fuente FBCV ↗
+            En pista no es un servicio oficial de la federación.{" "}
+            <a href={FBCV_URL} target="_blank" rel="noreferrer">
+              Calendario oficial <Icon name="external" />
             </a>
           </span>
-        </footer>
-      </main>
-    </>
+        </div>
+      </footer>
+    </div>
   );
 }
