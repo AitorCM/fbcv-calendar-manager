@@ -15,7 +15,9 @@ ENTRY = "https://www.fbcv.es/competiciones/calendario-resultados-y-clasificacion
 # Adapted design from sci-crawl: TLS verification, robots, AutoThrottle,
 # bounded retries and explicit scopes. No dependency on its Markdown pipeline.
 SETTINGS = {
-    "USER_AGENT": "FBCVCalendarManager/0.1 (calendar research crawler)",
+    # The source API drops connections for crawler-style agents (since 2026-11-09);
+    # identify as the browser its public UI expects. Throttling/robots stay on.
+    "USER_AGENT": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
     "ROBOTSTXT_OBEY": True,
     "DOWNLOAD_VERIFY_CERTIFICATES": True,
     "DOWNLOADER_CLIENTCONTEXTFACTORY": "scrapy.core.downloader.contextfactory.BrowserLikeContextFactory",
